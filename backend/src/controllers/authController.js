@@ -53,6 +53,10 @@ export const register = async (req, res, next) => {
       const emailSent = await sendEmail(emailOptions);
       if (!emailSent) {
         console.log(`[DEV MODE] Verification OTP for ${user.email} is: ${verificationOTP}`);
+        if (process.env.NODE_ENV === 'production') {
+          res.status(500);
+          return next(new Error('Failed to send verification email. Please check your SMTP configuration.'));
+        }
       }
 
       // For development speed, register logs in directly and returns verified token if required,
@@ -198,6 +202,10 @@ export const forgotPassword = async (req, res, next) => {
     const emailSent = await sendEmail(emailOptions);
     if (!emailSent) {
       console.log(`[DEV MODE] Password Reset OTP for ${user.email} is: ${resetOTP}`);
+      if (process.env.NODE_ENV === 'production') {
+        res.status(500);
+        return next(new Error('Failed to send password reset OTP. Please check your SMTP configuration.'));
+      }
     }
 
     res.json({
@@ -353,6 +361,10 @@ export const resendOTP = async (req, res, next) => {
     const emailSent = await sendEmail(emailOptions);
     if (!emailSent) {
       console.log(`[DEV MODE] Resent Verification OTP for ${user.email} is: ${verificationOTP}`);
+      if (process.env.NODE_ENV === 'production') {
+        res.status(500);
+        return next(new Error('Failed to send verification email. Please check your SMTP configuration.'));
+      }
     }
 
     res.json({
