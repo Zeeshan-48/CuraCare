@@ -1,0 +1,260 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'Outfit', system-ui, sans-serif;
+
+  --color-primary-50: hsl(164, 76%, 96%);
+  --color-primary-100: hsl(164, 71%, 91%);
+  --color-primary-200: hsl(164, 69%, 81%);
+  --color-primary-300: hsl(164, 65%, 68%);
+  --color-primary-400: hsl(164, 60%, 53%);
+  --color-primary-500: hsl(164, 72%, 40%); /* Primary brand teal */
+  --color-primary-600: hsl(164, 76%, 33%);
+  --color-primary-700: hsl(164, 78%, 27%);
+  --color-primary-800: hsl(164, 77%, 22%);
+  --color-primary-900: hsl(164, 75%, 17%);
+
+  --color-secondary-50: hsl(142, 76%, 96%);
+  --color-secondary-100: hsl(142, 71%, 91%);
+  --color-secondary-200: hsl(142, 69%, 81%);
+  --color-secondary-300: hsl(142, 65%, 68%);
+  --color-secondary-400: hsl(142, 60%, 53%);
+  --color-secondary-500: hsl(142, 72%, 40%); /* Secondary brand mint */
+  --color-secondary-600: hsl(142, 76%, 33%);
+
+  --color-accent-50: hsl(239, 100%, 98%);
+  --color-accent-100: hsl(239, 100%, 96%);
+  --color-accent-200: hsl(239, 100%, 93%);
+  --color-accent-500: hsl(239, 84%, 67%); /* Accent Purple */
+  --color-accent-600: hsl(239, 72%, 59%);
+
+  --color-dark-50: #f8fafc;
+  --color-dark-100: #f1f5f9;
+  --color-dark-200: #e2e8f0;
+  --color-dark-300: #cbd5e1;
+  --color-dark-400: #94a3b8;
+  --color-dark-500: #64748b;
+  --color-dark-600: #475569;
+  --color-dark-700: #334155;
+  --color-dark-800: #1e293b;
+  --color-dark-900: #0f172a;
+  --color-dark-950: #020617; /* Slate deeps */
+
+  --color-glass-light: rgba(255, 255, 255, 0.45);
+  --color-glass-dark: rgba(15, 23, 42, 0.45);
+
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --shadow-glass-hover: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+  --shadow-glow-primary: 0 0 20px rgba(13, 148, 136, 0.15);
+
+  --animate-shimmer: shimmer 2s infinite linear;
+
+  --color-txt-title: var(--txt-title);
+  --color-txt-main: var(--txt-main);
+  --color-txt-muted: var(--txt-muted);
+  --color-bdr-main: var(--bdr-main);
+  --color-bdr-light: var(--bdr-light);
+  --color-bg-panel: var(--bg-panel);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Custom dark variant manual override support in Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --txt-title: #0f172a;
+  --txt-main: #334155;
+  --txt-muted: #64748b;
+  --bdr-main: #e2e8f0;
+  --bdr-light: #f1f5f9;
+  --bg-panel: #ffffff;
+}
+
+html.dark {
+  --txt-title: #ffffff;
+  --txt-main: #cbd5e1;
+  --txt-muted: #94a3b8;
+  --bdr-main: #1e293b;
+  --bdr-light: #0f172a;
+  --bg-panel: #0f172a;
+}
+
+/* Global Base Styles */
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+  background-color: var(--color-dark-50);
+  color: var(--txt-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark {
+  background-color: var(--color-dark-950);
+  color: var(--txt-main);
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hide default scrollbars and style cleanly */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-300);
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-dark-700);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-400);
+}
+
+/* Glassmorphism utility classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: var(--shadow-glass);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: var(--shadow-glass-hover);
+  transform: translateY(-2px);
+}
+
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dark .glass-card:hover {
+  background: rgba(30, 41, 59, 0.65);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Form inputs & styling */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-dark-200);
+  background-color: white;
+  color: var(--color-dark-900);
+  outline: none;
+  font-family: var(--font-sans);
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+.dark .form-input {
+  border-color: var(--color-dark-800);
+  background-color: var(--color-dark-900);
+  color: white;
+}
+
+.dark .form-input:focus {
+  border-color: var(--color-primary-400);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.15);
+}
+
+/* Aesthetic Utilities */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .text-gradient {
+  background: linear-gradient(135deg, var(--color-primary-400), #a7f3d0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Micro-interactions & animations */
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-glow {
+  transition: all 0.3s ease;
+}
+.hover-glow:hover {
+  box-shadow: var(--shadow-glow-primary);
+}
+
+/* Skeleton Loading Shimmer Effect */
+.shimmer {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.footer-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background-color: var(--color-dark-950);
+  border: 1px solid var(--color-dark-800);
+  color: white;
+  outline: none;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+.footer-input::placeholder {
+  color: var(--color-dark-500);
+}
+.footer-input:focus {
+  border-color: var(--color-primary-500);
+}
