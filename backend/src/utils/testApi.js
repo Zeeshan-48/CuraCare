@@ -203,6 +203,7 @@ async function runTests() {
       },
       body: JSON.stringify({
         items: [{ productId: firstProductId, name: prodBefore.name, quantity: 3, price: prodBefore.price }],
+        prescriptionImage: 'dummy_prescription.png',
         shippingAddress: {
           street: '123 Health Ave',
           city: 'Wellness',
@@ -218,6 +219,9 @@ async function runTests() {
       }),
     });
     const orderData = await orderRes.json();
+    if (orderRes.status !== 201) {
+      console.error('Order creation failed with response:', orderData);
+    }
     assert.strictEqual(orderRes.status, 201);
     assert.ok(orderData.trackingNumber, 'Should generate a tracking number');
     assert.strictEqual(orderData.orderStatus, 'pending');
@@ -268,6 +272,9 @@ async function runTests() {
       }),
     });
     const data = await res.json();
+    if (res.status !== 200) {
+      console.error('AI recommendations failed with response:', data);
+    }
     assert.strictEqual(res.status, 200);
     assert.ok(data.analysis, 'Response should contain symptom analysis');
     assert.ok(Array.isArray(data.recommendations), 'Response recommendations should be an array');

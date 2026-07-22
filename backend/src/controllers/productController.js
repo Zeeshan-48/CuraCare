@@ -268,8 +268,7 @@ export const getAiRecommendations = async (req, res, next) => {
   try {
     const products = await Product.find({}).populate('category', 'name');
 
-    if (!process.env.GEMINI_API_KEY) {
-      // Fallback: Keyword matching
+    const runFallback = () => {
       const keywords = symptomInput.toLowerCase().split(/[\s,]+/);
       const matched = products.filter((prod) => {
         return keywords.some(
@@ -292,6 +291,10 @@ export const getAiRecommendations = async (req, res, next) => {
         disclaimer: "Clinical Safety Disclaimer: CuraCare AI recommendations are simulated search matches and do NOT constitute professional medical advice, prescription guidelines, or diagnosis. Always consult with a doctor before consuming drugs.",
         isFallback: true,
       });
+    };
+
+    if (!process.env.GEMINI_API_KEY) {
+      return runFallback();
     }
 
     const catalog = products.map((p) => ({
@@ -326,56 +329,61 @@ Do not include any markdown formatting or prefix like \`\`\`json. Return only th
 Product Catalog:
 ${JSON.stringify(catalog)}`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: `${systemPrompt}\n\nUser Symptoms:\n${symptomInput}` }],
-            },
-          ],
-        }),
-      }
-    );
-
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'Failed to call Gemini API');
-    }
-
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    let aiResponse;
     try {
-      const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-      aiResponse = JSON.parse(cleaned);
-    } catch (e) {
-      console.error('Failed to parse Gemini JSON:', text);
-      throw new Error('Invalid JSON format returned by AI model');
-    }
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: `${systemPrompt}\n\nUser Symptoms:\n${symptomInput}` }],
+              },
+            ],
+          }),
+        }
+      );
 
-    const matchedProducts = [];
-    if (aiResponse.recommendations && Array.isArray(aiResponse.recommendations)) {
-      for (const rec of aiResponse.recommendations) {
-        const prod = products.find((p) => p._id.toString() === rec.productId);
-        if (prod) {
-          matchedProducts.push({
-            product: prod,
-            reason: rec.reason,
-          });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Failed to call Gemini API');
+      }
+
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+      let aiResponse;
+      try {
+        const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        aiResponse = JSON.parse(cleaned);
+      } catch (e) {
+        console.error('Failed to parse Gemini JSON:', text);
+        throw new Error('Invalid JSON format returned by AI model');
+      }
+
+      const matchedProducts = [];
+      if (aiResponse.recommendations && Array.isArray(aiResponse.recommendations)) {
+        for (const rec of aiResponse.recommendations) {
+          const prod = products.find((p) => p._id.toString() === rec.productId);
+          if (prod) {
+            matchedProducts.push({
+              product: prod,
+              reason: rec.reason,
+            });
+          }
         }
       }
-    }
 
-    res.json({
-      analysis: aiResponse.analysis,
-      recommendations: matchedProducts,
-      disclaimer: aiResponse.disclaimer || "Always consult with a doctor before consuming drugs.",
-      isFallback: false,
-    });
+      res.json({
+        analysis: aiResponse.analysis,
+        recommendations: matchedProducts,
+        disclaimer: aiResponse.disclaimer || "Always consult with a doctor before consuming drugs.",
+        isFallback: false,
+      });
+    } catch (apiError) {
+      console.warn('Gemini API call failed, falling back to local keyword matching:', apiError.message);
+      return runFallback();
+    }
   } catch (error) {
     next(error);
   }
