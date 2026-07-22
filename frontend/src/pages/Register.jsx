@@ -195,7 +195,6 @@ const Register = () => {
               theme="outline"
               shape="rectangular"
               size="large"
-              width="100%"
             />
           </div>
 
