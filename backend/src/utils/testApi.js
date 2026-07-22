@@ -233,6 +233,28 @@ async function runTests() {
     assert.strictEqual(prodAfter.stock, originalStock - 3, 'Stock should decrease by 3');
   });
 
+  // 10. Cancel Order & Restore Inventory Stock
+  await test('Cancel Order & Restore Inventory Stock', async () => {
+    const prodResBefore = await fetch(`${BASE_URL}/products/${firstProductId}`);
+    const prodBefore = await prodResBefore.json();
+    const stockBeforeCancel = prodBefore.stock;
+
+    const cancelRes = await fetch(`${BASE_URL}/orders/${orderId}/cancel`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${customerToken}`,
+      },
+    });
+    const cancelData = await cancelRes.json();
+    assert.strictEqual(cancelRes.status, 200);
+    assert.strictEqual(cancelData.success, true);
+    assert.strictEqual(cancelData.order.orderStatus, 'cancelled');
+
+    const prodResAfter = await fetch(`${BASE_URL}/products/${firstProductId}`);
+    const prodAfter = await prodResAfter.json();
+    assert.strictEqual(prodAfter.stock, stockBeforeCancel + 3, 'Stock should increase by 3 after cancellation');
+  });
+
   // 10. Post Review & Recalculate Rating
   await test('Write Product Review & Recalculate Rating', async () => {
     const reviewRes = await fetch(`${BASE_URL}/reviews`, {

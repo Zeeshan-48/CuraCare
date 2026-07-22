@@ -1,20 +1,28 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ShoppingBag, Calendar, MapPin, Truck, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
-import { getMyOrdersApi } from '../utils/api.js';
+import { getMyOrdersApi, cancelOrderApi, getErrorMessage } from '../utils/api.js';
 import { useToast } from '../components/ui/Toast.jsx';
 import Button from '../components/ui/Button.jsx';
 
 const Orders = () => {
   const { showToast } = useToast();
 
-  const { data: orders = [], isLoading } = useQuery({
+  const { data: orders = [], isLoading, refetch } = useQuery({
     queryKey: ['my-orders'],
     queryFn: getMyOrdersApi,
   });
 
-  const handleCancelOrder = (orderId) => {
-    showToast('Please contact customer support at support@curacare.com to cancel your order.', 'info');
+  const handleCancelOrder = async (orderId) => {
+    if (window.confirm('Are you sure you want to cancel this order? This will restore the items back to stock.')) {
+      try {
+        const response = await cancelOrderApi(orderId);
+        showToast(response.message || 'Order cancelled successfully', 'success');
+        refetch();
+      } catch (error) {
+        showToast(getErrorMessage(error), 'error');
+      }
+    }
   };
 
   const getStatusColor = (status) => {

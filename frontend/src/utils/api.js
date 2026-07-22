@@ -161,6 +161,11 @@ export const getOrderByIdApi = async (id) => {
   return response.data;
 };
 
+export const cancelOrderApi = async (id) => {
+  const response = await API.put(`/orders/${id}/cancel`);
+  return response.data;
+};
+
 export const getAllOrdersApi = async () => {
   const response = await API.get('/orders');
   return response.data;

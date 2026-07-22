@@ -203,3 +203,51 @@ export const updateOrderPrescriptionStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Cancel an order (Customer/User)
+// @route   PUT /api/orders/:id/cancel
+// @access  Private
+export const cancelOrder = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const order = await Order.findById(id);
+
+    if (!order) {
+      res.status(404);
+      return next(new Error('Order not found'));
+    }
+
+    // Ensure the order belongs to the logged-in user or the user is an admin
+    if (order.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      res.status(403);
+      return next(new Error('Not authorized to cancel this order'));
+    }
+
+    // Only allow cancellation if order is pending
+    if (order.orderStatus !== 'pending') {
+      res.status(400);
+      return next(new Error(`Cannot cancel order. Status is already '${order.orderStatus}'`));
+    }
+
+    // Restore product stock
+    for (const item of order.items) {
+      const product = await Product.findById(item.productId);
+      if (product) {
+        product.stock += item.quantity;
+        await product.save();
+      }
+    }
+
+    order.orderStatus = 'cancelled';
+    const updatedOrder = await order.save();
+
+    res.json({
+      success: true,
+      message: 'Order cancelled successfully',
+      order: updatedOrder,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
