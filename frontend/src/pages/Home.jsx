@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck,
@@ -25,6 +26,11 @@ import Button from '../components/ui/Button.jsx';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/register" replace />;
+  }
 
   // Banner State
   const [currentBanner, setCurrentBanner] = useState(0);

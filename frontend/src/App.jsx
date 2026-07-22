@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -68,6 +68,7 @@ function App() {
                 {/* Authentication Routes */}
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
+                <Route path="signup" element={<Navigate to="/register" replace />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
                 <Route path="reset-password" element={<ResetPassword />} />
                 <Route path="verify-email" element={<VerifyEmail />} />
