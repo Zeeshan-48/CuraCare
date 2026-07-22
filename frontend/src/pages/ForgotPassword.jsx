@@ -31,7 +31,11 @@ const ForgotPassword = () => {
     setIsLoading(true);
     try {
       const response = await forgotPasswordApi(data.email);
-      showToast(response.message, 'success');
+      if (response.otp) {
+        showToast(`Reset OTP code: ${response.otp}`, 'success');
+      } else {
+        showToast(response.message, 'success');
+      }
       // Redirect to reset password and pass email in state
       navigate('/reset-password', { state: { email: data.email } });
     } catch (error) {

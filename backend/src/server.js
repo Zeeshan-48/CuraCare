@@ -7,6 +7,15 @@ import mongoSanitize from 'mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dns from 'dns';
+
+// Fix for local Windows DNS resolution issues (specifically querySrv ECONNREFUSED)
+dns.setDefaultResultOrder('ipv4first');
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (err) {
+  console.warn('DNS setServers failed, proceeding with default resolver:', err.message);
+}
 
 import connectDB from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
