@@ -31,6 +31,10 @@ const Cart = () => {
   const [couponInput, setCouponInput] = useState('');
 
   const handleQuantityChange = (productId, qty, stock) => {
+    if (qty < 1) {
+      handleRemove(productId);
+      return;
+    }
     if (qty > stock) {
       showToast(`Cannot exceed available stock of ${stock}`, 'warning');
       return;

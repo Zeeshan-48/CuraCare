@@ -154,6 +154,16 @@ export const updateOrderStatus = async (req, res, next) => {
       return next(new Error('Order not found'));
     }
 
+    if (orderStatus && orderStatus === 'cancelled' && order.orderStatus !== 'cancelled') {
+      for (const item of order.items) {
+        const product = await Product.findById(item.productId);
+        if (product) {
+          product.stock += item.quantity;
+          await product.save();
+        }
+      }
+    }
+
     if (orderStatus) {
       order.orderStatus = orderStatus;
     }
