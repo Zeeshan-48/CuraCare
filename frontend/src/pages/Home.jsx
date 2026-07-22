@@ -112,7 +112,7 @@ const Home = () => {
               className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing select-none"
             >
               {/* Blending Gradient Overlay - Adapts seamlessly to light/dark panel theme */}
-              <div className="absolute inset-0 .bg-gradient-to-r from-bg-panel via-bg-panel/75 to-transparent z-10 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-bg-panel via-bg-panel/75 to-transparent z-10 pointer-events-none" />
               {banners[currentBanner] && (
                 <>
                   <img
