@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { authStart, authSuccess, authFailure } from '../features/auth/authSlice.js';
-import { loginApi, getErrorMessage } from '../utils/api.js';
+import { loginApi, googleLoginApi, getErrorMessage } from '../utils/api.js';
+import { GoogleLogin } from '@react-oauth/google';
 import { syncCartWithBackend } from '../features/cart/cartSlice.js';
 import { useToast } from '../components/ui/Toast.jsx';
 import Input from '../components/ui/Input.jsx';
@@ -57,6 +58,33 @@ const Login = () => {
 
   // Redirect target
   const from = location.state?.from?.pathname || '/';
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    dispatch(authStart());
+    try {
+      const response = await googleLoginApi(credentialResponse.credential);
+      sessionStorage.removeItem('login_form');
+      dispatch(authSuccess(response));
+      showToast(`Welcome back, ${response.user.name}!`, 'success');
+
+      // Sync local cart items with backend
+      dispatch(syncCartWithBackend());
+
+      if (response.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate(from, { replace: true });
+      }
+    } catch (error) {
+      const errorMsg = getErrorMessage(error);
+      dispatch(authFailure(errorMsg));
+      showToast(errorMsg, 'error');
+    }
+  };
+
+  const handleGoogleError = () => {
+    showToast('Google Sign-In failed. Please try again.', 'error');
+  };
 
   const onSubmit = async (data) => {
     dispatch(authStart());
@@ -140,6 +168,27 @@ const Login = () => {
               Sign In
             </Button>
           </form>
+
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-bdr-light"></div>
+            </div>
+            <div className="relative flex justify-center text-[10px] uppercase tracking-wider font-bold">
+              <span className="bg-bg-panel px-3 text-txt-muted">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              theme="outline"
+              shape="rectangular"
+              size="large"
+              width="100%"
+            />
+          </div>
 
           {/* Social Links / Switch */}
           <div className="mt-8 pt-6 border-t border-bdr-light text-center text-sm">

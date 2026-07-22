@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import sendEmail from '../utils/sendEmail.js';
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Helper to generate JWT Token
 const generateToken = (id) => {
@@ -374,5 +377,59 @@ export const resendOTP = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+// @desc    Google OAuth Login
+// @route   POST /api/auth/google
+// @access  Public
+export const googleLogin = async (req, res, next) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, picture, email_verified } = payload;
+
+    if (!email_verified) {
+      res.status(400);
+      return next(new Error('Google email is not verified'));
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Auto-register user if they don't exist
+      // Generate a secure random password since it is a required field in Mongoose schema
+      const randomPassword = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
+      user = await User.create({
+        name,
+        email,
+        password: randomPassword,
+        profileImage: picture,
+        isVerified: true, // Google emails are pre-verified
+        role: 'customer',
+      });
+    }
+
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        role: user.role,
+        profileImage: user.profileImage || picture,
+        isVerified: user.isVerified,
+      },
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    res.status(401);
+    next(new Error('Invalid Google token'));
   }
 };

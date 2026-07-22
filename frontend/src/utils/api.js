@@ -47,6 +47,11 @@ export const registerApi = async (name, email, password) => {
   return response.data;
 };
 
+export const googleLoginApi = async (token) => {
+  const response = await API.post('/auth/google', { token });
+  return response.data;
+};
+
 export const verifyOtpApi = async (email, otp) => {
   const response = await API.post('/auth/verify-otp', { email, otp });
   return response.data;

@@ -6,8 +6,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Eye, EyeOff } from 'lucide-react';
 
-import { authStart, authFailure } from '../features/auth/authSlice.js';
-import { registerApi, getErrorMessage } from '../utils/api.js';
+import { authStart, authFailure, authSuccess } from '../features/auth/authSlice.js';
+import { registerApi, googleLoginApi, getErrorMessage } from '../utils/api.js';
+import { GoogleLogin } from '@react-oauth/google';
 import { useToast } from '../components/ui/Toast.jsx';
 import Input from '../components/ui/Input.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -33,6 +34,25 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { showToast } = useToast();
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    dispatch(authStart());
+    try {
+      const response = await googleLoginApi(credentialResponse.credential);
+      sessionStorage.removeItem('register_form');
+      dispatch(authSuccess(response));
+      showToast(`Welcome to CuraCare, ${response.user.name}!`, 'success');
+      navigate('/');
+    } catch (error) {
+      const errorMsg = getErrorMessage(error);
+      dispatch(authFailure(errorMsg));
+      showToast(errorMsg, 'error');
+    }
+  };
+
+  const handleGoogleError = () => {
+    showToast('Google Sign-Up failed. Please try again.', 'error');
+  };
 
   const storedValues = (() => {
     const saved = sessionStorage.getItem('register_form');
@@ -157,6 +177,27 @@ const Register = () => {
               Sign Up
             </Button>
           </form>
+
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-bdr-light"></div>
+            </div>
+            <div className="relative flex justify-center text-[10px] uppercase tracking-wider font-bold">
+              <span className="bg-bg-panel px-3 text-txt-muted">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              theme="outline"
+              shape="rectangular"
+              size="large"
+              width="100%"
+            />
+          </div>
 
           {/* Login Switch */}
           <div className="mt-8 pt-6 border-t border-bdr-light text-center text-sm">
