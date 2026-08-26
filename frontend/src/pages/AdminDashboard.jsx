@@ -1014,6 +1014,7 @@ const AdminDashboard = () => {
           <Input
             label="Category Name"
             name="name"
+            placeholder="e.g. Vitamins & Supplements"
             defaultValue={editingCategory ? (editingCategory.name || '') : (categoryForm.formData.name || '')}
             required
           />
@@ -1024,6 +1025,7 @@ const AdminDashboard = () => {
             <textarea
               name="description"
               rows="3"
+              placeholder="e.g. Products containing essential vitamins and dietary supplements."
               defaultValue={editingCategory ? (editingCategory.description || '') : (categoryForm.formData.description || '')}
               className="form-input text-sm resize-none"
               required
