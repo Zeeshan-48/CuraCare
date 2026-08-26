@@ -6,8 +6,6 @@ import {
   Heart,
   User,
   LogOut,
-  Sun,
-  Moon,
   Menu,
   X,
   LayoutDashboard,
@@ -18,9 +16,6 @@ import { useToast } from '../ui/Toast.jsx';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
-  const [isDark, setIsDark] = useState(() =>
-    document.documentElement.classList.contains('dark')
-  );
   const [isScrolled, setIsScrolled] = useState(false);
   const navRef = useRef(null);
 
@@ -53,17 +48,7 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      setIsDark(true);
-    }
-  };
+
 
   // Scroll handler to make navbar float or sit flush
   useEffect(() => {
