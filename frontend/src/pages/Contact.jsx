@@ -60,7 +60,9 @@ const Contact = () => {
                 <div>
                   <p className="text-sm font-semibold text-txt-title">Our Location</p>
                   <p className="text-sm text-txt-muted mt-1">
-                    123 Medical Avenue, Clinic Tower, NY 10001
+                    <a href="https://maps.google.com/?q=987P%2BJ3F%2C%20Near%20Pathal%20kudwa%20Chowk%2C%20Pathalkudwa%2C%20Ranchi%2C%20Jharkhand%20834001" target="_blank" rel="noopener noreferrer" className="hover:text-primary-500 transition-colors">
+                      987P+J3F, Near Pathal kudwa Chowk, Pathalkudwa, Ranchi, Jharkhand 834001
+                    </a>
                   </p>
                 </div>
               </div>
@@ -71,7 +73,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-txt-title">Call Us</p>
-                  <p className="text-sm text-txt-muted mt-1">+1 (800) 555-CURA</p>
+                  <p className="text-sm text-txt-muted mt-1">7903719233</p>
                 </div>
               </div>
 
@@ -81,7 +83,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-txt-title">Email Us</p>
-                  <p className="text-sm text-txt-muted mt-1">support@curacare.com</p>
+                  <p className="text-sm text-txt-muted mt-1">zeshan1234anwar@gmail.com</p>
                 </div>
               </div>
 

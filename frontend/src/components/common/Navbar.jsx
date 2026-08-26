@@ -127,11 +127,6 @@ const Navbar = () => {
               <NavLink to="/ai-recommendations" className={activeLinkStyle}>
                 AI Guide
               </NavLink>
-              {isAuthenticated && user?.role === 'admin' && (
-                <NavLink to="/admin" className={activeLinkStyle}>
-                  Admin Dashboard
-                </NavLink>
-              )}
               <NavLink to="/about" className={activeLinkStyle}>
                 About Us
               </NavLink>
@@ -141,6 +136,11 @@ const Navbar = () => {
               <NavLink to="/faqs" className={activeLinkStyle}>
                 FAQs
               </NavLink>
+              {isAuthenticated && user?.role === 'admin' && (
+                <NavLink to="/admin" className={activeLinkStyle}>
+                  Admin Dashboard
+                </NavLink>
+              )}
             </div>
 
             {/* Action Icons */}
