@@ -313,7 +313,7 @@ const Profile = () => {
                         <div key={idx} className="p-3 bg-bg-panel border border-bdr-main rounded-xl flex justify-between items-center text-xs">
                           <div>
                             <p className="font-semibold text-txt-title">{med.name}</p>
-                            <p className="text-[10px] text-dark-450 mt-0.5">Purchased at ${med.price.toFixed(2)}</p>
+                            <p className="text-[10px] text-dark-450 mt-0.5">Purchased at ₹{med.price.toFixed(2)}</p>
                           </div>
                           <div className="flex gap-2 shrink-0">
                             {hasReminder ? (

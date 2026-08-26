@@ -486,7 +486,7 @@ const Checkout = () => {
               className="w-full py-4 text-base font-bold shadow-lg"
               isLoading={isPlacing}
             >
-              Place Your Order (${totals.total.toFixed(2)})
+              Place Your Order (₹{totals.total.toFixed(2)})
             </Button>
           </form>
         </div>
@@ -509,7 +509,7 @@ const Checkout = () => {
                       <p className="text-[10px] text-dark-400">Qty: {item.quantity}</p>
                     </div>
                     <span className="font-bold text-txt-title">
-                      ${(discountedPrice * item.quantity).toFixed(2)}
+                      ₹{(discountedPrice * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 );
@@ -520,27 +520,27 @@ const Checkout = () => {
             <div className="border-t border-dark-100 dark:border-dark-850 pt-4 space-y-2 text-xs text-txt-muted">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${totals.subtotal.toFixed(2)}</span>
+                <span>₹{totals.subtotal.toFixed(2)}</span>
               </div>
               {totals.discountAmount > 0 && (
                 <div className="flex justify-between text-amber-500 font-semibold">
                   <span>Savings</span>
-                  <span>-${totals.discountAmount.toFixed(2)}</span>
+                  <span>-₹{totals.discountAmount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span>Tax (5%)</span>
-                <span>${totals.tax.toFixed(2)}</span>
+                <span>₹{totals.tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>{totals.shipping === 0 ? 'FREE' : `$${totals.shipping.toFixed(2)}`}</span>
+                <span>{totals.shipping === 0 ? 'FREE' : `₹${totals.shipping.toFixed(2)}`}</span>
               </div>
             </div>
 
             <div className="border-t border-dark-100 dark:border-dark-850 pt-4 flex justify-between font-display font-bold text-base text-txt-title">
               <span>Total Bill</span>
-              <span>${totals.total.toFixed(2)}</span>
+              <span>₹{totals.total.toFixed(2)}</span>
             </div>
 
             <div className="p-3 bg-bdr-light/40 rounded-xl flex items-center justify-center gap-1.5 text-[10px] text-dark-450 border border-dark-100 dark:border-dark-850 mt-4">

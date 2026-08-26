@@ -8,7 +8,7 @@ const initialState = {
   couponCode: null,
   discountPercentage: 0,
   taxRate: 0.05, // 5% flat tax on medical products
-  shippingRate: 10, // $10 flat shipping
+  shippingRate: 10, // ₹10 flat shipping
 };
 
 // Helper function to calculate totals

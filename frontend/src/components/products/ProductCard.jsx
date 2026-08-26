@@ -60,11 +60,10 @@ const ProductCard = ({ product }) => {
       <button
         onClick={handleToggleWishlist}
         aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-        className={`absolute top-3 right-3 z-10 p-2 rounded-xl bg-bg-panel/80 border border-bdr-main/50 cursor-pointer transition-all duration-300 ${
-          isWishlisted
-            ? 'text-red-500 hover:text-red-600 scale-105'
-            : 'text-txt-muted hover:text-red-500 hover:scale-105'
-        }`}
+        className={`absolute top-3 right-3 z-10 p-2 rounded-xl bg-bg-panel/80 border border-bdr-main/50 cursor-pointer transition-all duration-300 ${isWishlisted
+          ? 'text-red-500 hover:text-red-600 scale-105'
+          : 'text-txt-muted hover:text-red-500 hover:scale-105'
+          }`}
       >
         <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} />
       </button>
@@ -120,15 +119,15 @@ const ProductCard = ({ product }) => {
               {product.discount > 0 ? (
                 <div className="flex flex-col">
                   <span className="text-[10px] sm:text-xs text-dark-400 line-through leading-none">
-                    ${product.price.toFixed(2)}
+                    ₹{product.price.toFixed(2)}
                   </span>
                   <span className="text-base sm:text-lg font-bold text-txt-title font-display leading-tight">
-                    ${discountedPrice.toFixed(2)}
+                    ₹{discountedPrice.toFixed(2)}
                   </span>
                 </div>
               ) : (
                 <span className="text-base sm:text-lg font-bold text-txt-title font-display">
-                  ${product.price.toFixed(2)}
+                  ₹{product.price.toFixed(2)}
                 </span>
               )}
             </div>
@@ -144,7 +143,7 @@ const ProductCard = ({ product }) => {
               </button>
               <button
                 onClick={handleBuyNow}
-                className="flex-[2] sm:flex-none px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] sm:text-xs font-bold shadow-md shadow-primary-500/10 hover:shadow-lg active:scale-95 transition-all cursor-pointer text-center"
+                className="flex-[/2] sm:flex-none px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] sm:text-xs font-bold shadow-md shadow-primary-500/10 hover:shadow-lg active:scale-95 transition-all cursor-pointer text-center"
               >
                 Buy Now
               </button>

@@ -169,7 +169,7 @@ const Cart = () => {
                 {/* Total Price for single item */}
                 <div className="text-right shrink-0 min-w-20">
                   <span className="font-display font-bold text-txt-title text-base">
-                    ${(discountedPrice * item.quantity).toFixed(2)}
+                    ₹{(discountedPrice * item.quantity).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -226,17 +226,17 @@ const Cart = () => {
             <div className="space-y-2 text-sm text-dark-600 dark:text-dark-455">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${totals.subtotal.toFixed(2)}</span>
+                <span>₹{totals.subtotal.toFixed(2)}</span>
               </div>
               {totals.discountAmount > 0 && (
                 <div className="flex justify-between text-amber-500 font-medium">
                   <span>Discount</span>
-                  <span>-${totals.discountAmount.toFixed(2)}</span>
+                  <span>-₹{totals.discountAmount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span>Tax (5%)</span>
-                <span>${totals.tax.toFixed(2)}</span>
+                <span>₹{totals.tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping Charges</span>
@@ -244,13 +244,13 @@ const Cart = () => {
                   {totals.shipping === 0 ? (
                     <span className="text-emerald-500 font-semibold">FREE</span>
                   ) : (
-                    `$${totals.shipping.toFixed(2)}`
+                    `₹${totals.shipping.toFixed(2)}`
                   )}
                 </span>
               </div>
               {totals.shipping > 0 && (
                 <p className="text-[10px] text-dark-400 text-right leading-none">
-                  Add ${(75 - (totals.subtotal - totals.discountAmount)).toFixed(2)} more for free
+                  Add ₹{(75 - (totals.subtotal - totals.discountAmount)).toFixed(2)} more for free
                   shipping!
                 </p>
               )}
@@ -258,7 +258,7 @@ const Cart = () => {
 
             <div className="flex justify-between font-display font-bold text-lg text-txt-title border-t border-dark-100 dark:border-dark-850 pt-4">
               <span>Total Price</span>
-              <span>${totals.total.toFixed(2)}</span>
+              <span>₹{totals.total.toFixed(2)}</span>
             </div>
 
             {/* Prescription warnings */}

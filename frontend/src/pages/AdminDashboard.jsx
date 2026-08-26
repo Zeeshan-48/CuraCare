@@ -363,8 +363,8 @@ const AdminDashboard = () => {
                   <span className="text-[10px] font-bold text-dark-400 uppercase tracking-wider block">
                     TOTAL REVENUE
                   </span>
-                  <p className="text-2xl font-extrabold text-txt-title mt-1.5 font-display">
-                    ${totalRevenue.toFixed(2)}
+                  <p className="font-display font-bold text-2xl text-txt-title leading-none">
+                    ₹{totalRevenue.toFixed(2)}
                   </p>
                 </div>
                 <div className="glass-panel p-5 rounded-2xl">
@@ -455,7 +455,7 @@ const AdminDashboard = () => {
                         <Tooltip />
                         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                           {categoryChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell key={`cell-₹{index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -510,7 +510,7 @@ const AdminDashboard = () => {
                               {isExpired && ' (Expired)'}
                               {isExpiringSoon && ' (Expiring Soon)'}
                             </td>
-                            <td className="p-4">${prod.price.toFixed(2)}</td>
+                            <td className="p-4">₹{prod.price.toFixed(2)}</td>
                             <td className={`p-4 font-bold ${prod.stock < 10 ? 'text-red-500' : ''}`}>{prod.stock}</td>
                           <td className="p-4 flex gap-2">
                             <button
@@ -746,9 +746,9 @@ const AdminDashboard = () => {
                               </span>
                             ))}
                           </div>
-                          <span className="font-bold text-primary-500 text-sm">
-                            Total: ${(order.totalAmount || order.totals?.total || order.totals?.subtotal || 0).toFixed(2)}
-                          </span>
+                          <p className="font-semibold text-txt-main">
+                            Total: ₹{(order.totalAmount || order.totals?.total || order.totals?.subtotal || 0).toFixed(2)}
+                          </p>
                         </div>
                       </div>
                     ))
