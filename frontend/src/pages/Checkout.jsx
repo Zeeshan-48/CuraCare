@@ -12,7 +12,8 @@ import {
   selectPrescriptionRequired,
   clearCart,
 } from '../features/cart/cartSlice.js';
-import { createOrderApi, uploadImageApi, getErrorMessage, createRazorpayOrderApi, verifySignatureApi } from '../utils/api.js';
+import { updateUserProfile } from '../features/auth/authSlice.js';
+import { createOrderApi, uploadImageApi, getErrorMessage, createRazorpayOrderApi, verifySignatureApi, updateProfileApi } from '../utils/api.js';
 import { useToast } from '../components/ui/Toast.jsx';
 import Input from '../components/ui/Input.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -48,6 +49,8 @@ const Checkout = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+
   const cartItems = useSelector((state) => state.cart.items);
   const totals = useSelector(selectCartTotals);
   const rxRequired = useSelector(selectPrescriptionRequired);
@@ -61,19 +64,34 @@ const Checkout = () => {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
-      street: '',
-      city: '',
-      state: '',
-      postalCode: '',
-      country: '',
-      phone: '',
+      street: user?.address?.street || '',
+      city: user?.address?.city || '',
+      state: user?.address?.state || '',
+      postalCode: user?.address?.postalCode || '',
+      country: user?.address?.country || '',
+      phone: user?.phone || '',
       paymentMethod: 'cod',
     },
   });
+
+  React.useEffect(() => {
+    if (user) {
+      reset({
+        street: user.address?.street || '',
+        city: user.address?.city || '',
+        state: user.address?.state || '',
+        postalCode: user.address?.postalCode || '',
+        country: user.address?.country || '',
+        phone: user.phone || '',
+        paymentMethod: watch('paymentMethod') || 'cod',
+      });
+    }
+  }, [user, reset]);
 
   const selectedPayment = watch('paymentMethod');
 
@@ -195,6 +213,26 @@ const Checkout = () => {
       };
 
       await createOrderApi(orderPayload);
+      
+      // Update profile with new delivery info silently
+      if (user) {
+        try {
+          const updatedUser = await updateProfileApi({
+            phone: data.phone,
+            address: {
+              street: data.street,
+              city: data.city,
+              state: data.state,
+              postalCode: data.postalCode,
+              country: data.country,
+            }
+          });
+          dispatch(updateUserProfile(updatedUser));
+        } catch (profileErr) {
+          console.error('Failed to update profile silently:', profileErr);
+        }
+      }
+
       dispatch(clearCart());
       queryClient.invalidateQueries({ queryKey: ['my-orders'] });
       showToast('Order placed successfully! Track it in your profile.', 'success');

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -22,6 +22,19 @@ const Navbar = () => {
     document.documentElement.classList.contains('dark')
   );
   const [isScrolled, setIsScrolled] = useState(false);
+  const navRef = useRef(null);
+
+  // Close menus on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setUserDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const cartItems = useSelector((state) => state.cart.items);
@@ -79,6 +92,7 @@ const Navbar = () => {
 
   return (
     <div
+      ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 sm:px-6 lg:px-8 ${isScrolled ? 'pt-4' : 'pt-0 md:pt-4'
         }`}
     >
@@ -131,14 +145,7 @@ const Navbar = () => {
 
             {/* Action Icons */}
             <div className="hidden md:flex items-center gap-3">
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                aria-label="Toggle Theme"
-                className="p-2.5 rounded-xl hover:bg-primary-50 dark:hover:bg-dark-900 text-txt-muted hover:text-primary-500 cursor-pointer transition-all duration-200"
-              >
-                {isDark ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
+
 
               {/* Wishlist */}
               <Link
@@ -260,14 +267,19 @@ const Navbar = () => {
             </div>
 
             <div className="flex items-center gap-2 md:hidden">
-              {/* Theme Toggle Mobile */}
-              <button
-                onClick={toggleTheme}
-                aria-label="Toggle Theme"
-                className="p-2 rounded-xl hover:bg-primary-50 dark:hover:bg-dark-900 text-txt-muted cursor-pointer"
+              {/* Wishlist Mobile */}
+              <Link
+                to="/wishlist"
+                aria-label="Wishlist Link"
+                className="relative p-2 rounded-xl hover:bg-primary-50 dark:hover:bg-dark-900 text-txt-muted"
               >
-                {isDark ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
+                <Heart size={18} />
+                {wishlistItems.length > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-500 text-white font-sans text-[9px] font-bold flex items-center justify-center">
+                    {wishlistItems.length}
+                  </span>
+                )}
+              </Link>
 
               {/* Cart Mobile */}
               <Link
@@ -297,7 +309,7 @@ const Navbar = () => {
 
       {/* Mobile Drawer Menu */}
       {isOpen && (
-        <div className="md:hidden glass-panel rounded-2xl shadow-2xl px-4 py-5 mt-2 space-y-4 max-w-7xl mx-auto">
+        <div className="md:hidden bg-bg-panel border border-bdr-main rounded-2xl shadow-2xl px-4 py-5 mt-2 space-y-4 max-w-7xl mx-auto">
           <div className="flex flex-col gap-1.5">
             <NavLink
               to="/"

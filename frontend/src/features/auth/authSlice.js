@@ -10,6 +10,7 @@ const initialState = {
   isAuthenticated: !!storedToken,
   isLoading: false,
   error: null,
+  isLoginModalOpen: false,
 };
 
 const authSlice = createSlice({
@@ -55,6 +56,12 @@ const authSlice = createSlice({
     clearAuthError: (state) => {
       state.error = null;
     },
+    showLoginModal: (state) => {
+      state.isLoginModalOpen = true;
+    },
+    hideLoginModal: (state) => {
+      state.isLoginModalOpen = false;
+    },
   },
 });
 
@@ -65,6 +72,8 @@ export const {
   logout,
   updateUserProfile,
   clearAuthError,
+  showLoginModal,
+  hideLoginModal,
 } = authSlice.actions;
 
 export default authSlice.reducer;

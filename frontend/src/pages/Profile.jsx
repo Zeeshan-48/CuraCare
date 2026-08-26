@@ -11,23 +11,16 @@ import { useToast } from '../components/ui/Toast.jsx';
 import Input from '../components/ui/Input.jsx';
 import Button from '../components/ui/Button.jsx';
 
-// Profile details validation schema
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  phone: z.string().min(8, 'Phone number must be at least 8 digits'),
+  phone: z.string().optional(),
+  street: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postalCode: z.string().optional(),
+  country: z.string().optional(),
 });
 
-// Password change validation schema
-const passwordChangeSchema = z
-  .object({
-    oldPassword: z.string().min(1, 'Old password is required'),
-    newPassword: z.string().min(6, 'New password must be at least 6 characters'),
-    confirmPassword: z.string().min(1, 'Confirm password is required'),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "New passwords don't match",
-    path: ['confirmPassword'],
-  });
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -100,6 +93,11 @@ const Profile = () => {
     defaultValues: {
       name: user?.name || '',
       phone: user?.phone || '',
+      street: user?.address?.street || '',
+      city: user?.address?.city || '',
+      state: user?.address?.state || '',
+      postalCode: user?.address?.postalCode || '',
+      country: user?.address?.country || '',
     },
   });
 
@@ -109,19 +107,15 @@ const Profile = () => {
       resetProfileForm({
         name: user.name || '',
         phone: user.phone || '',
+        street: user?.address?.street || '',
+        city: user?.address?.city || '',
+        state: user?.address?.state || '',
+        postalCode: user?.address?.postalCode || '',
+        country: user?.address?.country || '',
       });
     }
   }, [user, resetProfileForm]);
 
-  // 2. Change password form setup
-  const {
-    register: registerPassword,
-    handleSubmit: handlePasswordSubmit,
-    reset: resetPasswordForm,
-    formState: { errors: passwordErrors },
-  } = useForm({
-    resolver: zodResolver(passwordChangeSchema),
-  });
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
@@ -143,7 +137,17 @@ const Profile = () => {
 
   const onProfileUpdate = async (data) => {
     try {
-      const updatedUser = await updateProfileApi({ name: data.name, phone: data.phone });
+      const updatedUser = await updateProfileApi({ 
+        name: data.name, 
+        phone: data.phone,
+        address: {
+          street: data.street,
+          city: data.city,
+          state: data.state,
+          postalCode: data.postalCode,
+          country: data.country,
+        }
+      });
       dispatch(updateUserProfile(updatedUser));
       showToast('Profile information saved.', 'success');
     } catch (error) {
@@ -151,16 +155,6 @@ const Profile = () => {
     }
   };
 
-  const onPasswordUpdate = async (data) => {
-    try {
-      const updatedUser = await updateProfileApi({ password: data.newPassword });
-      dispatch(updateUserProfile(updatedUser));
-      resetPasswordForm();
-      showToast('Password changed successfully.', 'success');
-    } catch (error) {
-      showToast(getErrorMessage(error), 'error');
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-left">
@@ -223,7 +217,46 @@ const Profile = () => {
                 error={profileErrors.phone?.message}
                 {...registerProfile('phone')}
               />
-              <div className="text-right">
+
+              <div className="pt-2 pb-1">
+                <h4 className="font-semibold text-sm text-txt-title">Delivery Address</h4>
+              </div>
+              <Input
+                label="Street Address"
+                placeholder="123 Health Ave, Apt 4"
+                error={profileErrors.street?.message}
+                {...registerProfile('street')}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="City"
+                  placeholder="New York"
+                  error={profileErrors.city?.message}
+                  {...registerProfile('city')}
+                />
+                <Input
+                  label="State / Province"
+                  placeholder="NY"
+                  error={profileErrors.state?.message}
+                  {...registerProfile('state')}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Postal Code"
+                  placeholder="10001"
+                  error={profileErrors.postalCode?.message}
+                  {...registerProfile('postalCode')}
+                />
+                <Input
+                  label="Country"
+                  placeholder="United States"
+                  error={profileErrors.country?.message}
+                  {...registerProfile('country')}
+                />
+              </div>
+
+              <div className="text-right pt-2">
                 <Button type="submit" variant="primary">
                   Save Changes
                 </Button>
@@ -231,40 +264,6 @@ const Profile = () => {
             </form>
           </div>
 
-          {/* Change Password Card */}
-          <div className="glass-panel p-8 rounded-3xl">
-            <h3 className="font-display font-bold text-lg text-txt-title mb-6">
-              Change Security Password
-            </h3>
-            <form onSubmit={handlePasswordSubmit(onPasswordUpdate)} className="space-y-4">
-              <Input
-                label="Current Password"
-                type="password"
-                placeholder="Enter current password"
-                error={passwordErrors.oldPassword?.message}
-                {...registerPassword('oldPassword')}
-              />
-              <Input
-                label="New Password"
-                type="password"
-                placeholder="Min 6 characters"
-                error={passwordErrors.newPassword?.message}
-                {...registerPassword('newPassword')}
-              />
-              <Input
-                label="Confirm New Password"
-                type="password"
-                placeholder="Confirm password"
-                error={passwordErrors.confirmPassword?.message}
-                {...registerPassword('confirmPassword')}
-              />
-              <div className="text-right">
-                <Button type="submit" variant="primary">
-                  Change Password
-                </Button>
-              </div>
-            </form>
-          </div>
 
           {/* Automated Refill Reminders Card */}
           <div className="glass-panel p-8 rounded-3xl">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, ArrowUpDown, RotateCcw, Search, ShieldCheck } from 'lucide-react';
+import { SlidersHorizontal, ArrowUpDown, RotateCcw, Search, ShieldCheck, ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getProductsApi, getCategoriesApi } from '../utils/api.js';
 import ProductCard from '../components/products/ProductCard.jsx';
@@ -15,6 +15,20 @@ const Products = () => {
   const [rxRequired, setRxRequired] = useState(null); // null = all, true = Rx, false = OTC
   const [sortBy, setSortBy] = useState('featured');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Drawer State
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  // Collapsible Filter States
+  const [openSections, setOpenSections] = useState({
+    categories: true, // Open by default so user sees it!
+    rx: false,
+    price: false,
+  });
+
+  const toggleSection = (section) => {
+    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
 
   // Fetch Categories
   const { data: categoriesData } = useQuery({
@@ -37,6 +51,7 @@ const Products = () => {
 
     if (urlCategory) {
       setSelectedCategories([urlCategory]);
+      setOpenSections(prev => ({ ...prev, categories: true }));
     } else {
       setSelectedCategories([]);
     }
@@ -63,6 +78,7 @@ const Products = () => {
     setSortBy('featured');
     setSearchQuery('');
     setSearchParams({});
+    setOpenSections({ categories: true, rx: false, price: false });
   };
 
   // Memoized Filtered & Sorted Products List
@@ -88,8 +104,6 @@ const Products = () => {
         return selectedCategories.includes(catName);
       });
     }
-
-
 
     // 4. Price Limit Filter
     result = result.filter((p) => {
@@ -124,6 +138,18 @@ const Products = () => {
     return result;
   }, [products, searchQuery, selectedCategories, priceRange, rxRequired, sortBy]);
 
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (isFilterDrawerOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isFilterDrawerOpen]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-left">
       {/* Page Title & Breadcrumbs */}
@@ -137,113 +163,148 @@ const Products = () => {
       </div>
 
       {/* Grid Layout: Sidebar Filters + Product List */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
-        {/* Sidebar Filters */}
-        <div className="lg:col-span-1 glass-panel p-6 rounded-3xl space-y-6">
-          <div className="flex items-center justify-between border-b border-dark-100 dark:border-dark-850 pb-4">
-            <span className="font-display font-bold text-txt-title flex items-center gap-2">
-              <SlidersHorizontal size={18} className="text-primary-500" />
-              Filters
-            </span>
-            <button
-              onClick={handleResetFilters}
-              className="text-xs font-semibold text-primary-500 hover:text-primary-600 flex items-center gap-1 cursor-pointer"
-            >
-              <RotateCcw size={12} />
-              Reset
-            </button>
-          </div>
+      <div className="relative">
+        
+        {/* Sidebar Filters Drawer */}
+        <div className={`fixed inset-0 z-[100] transition-opacity duration-300 ${isFilterDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsFilterDrawerOpen(false)} />
+          
+          {/* Drawer Panel */}
+          <div className={`absolute top-0 left-0 bottom-0 w-[85vw] max-w-[320px] glass-panel rounded-none rounded-r-3xl border-l-0 shadow-2xl transition-transform duration-300 flex flex-col ${isFilterDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className="p-6 space-y-6 flex-1 overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-dark-100 dark:border-dark-850 pb-4">
+                <span className="font-display font-bold text-txt-title flex items-center gap-2">
+                  <SlidersHorizontal size={18} className="text-primary-500" />
+                  Filters
+                </span>
+                <button
+                  onClick={handleResetFilters}
+                  className="text-xs font-semibold text-primary-500 hover:text-primary-600 flex items-center gap-1 cursor-pointer"
+                >
+                  <RotateCcw size={12} />
+                  Reset
+                </button>
+              </div>
 
-          {/* Categories checklist */}
-          <div>
-            <h3 className="font-display font-bold text-xs text-txt-title uppercase tracking-wider mb-3">
-              Categories
-            </h3>
-            <div className="space-y-2.5">
-              {categories.map((cat) => (
-                <label key={cat._id} className="flex items-center gap-2.5 text-sm text-dark-600 dark:text-dark-350 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(cat.name)}
-                    onChange={() => handleCategoryChange(cat.name)}
-                    className="accent-primary-500 rounded border-dark-200"
-                  />
-                  <span>{cat.name}</span>
-                </label>
-              ))}
+              {/* Categories checklist */}
+              <div className="border-b border-dark-100 dark:border-dark-850 pb-4">
+                <button
+                  onClick={() => toggleSection('categories')}
+                  className="w-full flex items-center justify-between font-display font-bold text-xs text-txt-title uppercase tracking-wider mb-2 cursor-pointer hover:text-primary-500 transition-colors"
+                >
+                  Categories
+                  <ChevronDown size={16} className={`transition-transform duration-300 ${openSections.categories ? 'rotate-180 text-primary-500' : 'text-dark-400'}`} />
+                </button>
+                {openSections.categories && (
+                  <div className="space-y-2.5 mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {categories.map((cat) => (
+                      <label key={cat._id} className="flex items-center gap-2.5 text-sm text-dark-600 dark:text-dark-350 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(cat.name)}
+                          onChange={() => handleCategoryChange(cat.name)}
+                          className="accent-primary-500 rounded border-dark-200"
+                        />
+                        <span>{cat.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Prescription Required checkbox */}
+              <div className="border-b border-dark-100 dark:border-dark-850 pb-4">
+                <button
+                  onClick={() => toggleSection('rx')}
+                  className="w-full flex items-center justify-between font-display font-bold text-xs text-txt-title uppercase tracking-wider mb-2 cursor-pointer hover:text-primary-500 transition-colors"
+                >
+                  Prescription Rule
+                  <ChevronDown size={16} className={`transition-transform duration-300 ${openSections.rx ? 'rotate-180 text-primary-500' : 'text-dark-400'}`} />
+                </button>
+                {openSections.rx && (
+                  <div className="space-y-2.5 mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <label className="flex items-center gap-2.5 text-sm text-dark-600 dark:text-dark-350 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="rx"
+                        checked={rxRequired === null}
+                        onChange={() => setRxRequired(null)}
+                        className="accent-primary-500"
+                      />
+                      <span>All Products</span>
+                    </label>
+                    <label className="flex items-center gap-2.5 text-sm text-dark-600 dark:text-dark-350 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="rx"
+                        checked={rxRequired === true}
+                        onChange={() => setRxRequired(true)}
+                        className="accent-primary-500"
+                      />
+                      <span>Prescription (Rx) Required</span>
+                    </label>
+                    <label className="flex items-center gap-2.5 text-sm text-dark-600 dark:text-dark-350 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="rx"
+                        checked={rxRequired === false}
+                        onChange={() => setRxRequired(false)}
+                        className="accent-primary-500"
+                      />
+                      <span>Over-The-Counter (OTC)</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {/* Price range selector slider */}
+              <div className="pb-2">
+                <button
+                  onClick={() => toggleSection('price')}
+                  className="w-full flex items-center justify-between font-display font-bold text-xs text-txt-title uppercase tracking-wider mb-2 cursor-pointer hover:text-primary-500 transition-colors"
+                >
+                  Max Price
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-primary-500">${priceRange}</span>
+                    <ChevronDown size={16} className={`transition-transform duration-300 ${openSections.price ? 'rotate-180 text-primary-500' : 'text-dark-400'}`} />
+                  </div>
+                </button>
+                {openSections.price && (
+                  <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <input
+                      type="range"
+                      min="2"
+                      max="100"
+                      value={priceRange}
+                      onChange={(e) => setPriceRange(Number(e.target.value))}
+                      className="w-full accent-primary-500 bg-dark-100 dark:bg-dark-800 rounded-lg cursor-pointer h-1.5"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="p-4 border-t border-bdr-main/50 bg-bg-panel/90 backdrop-blur-md rounded-br-3xl">
+              <Button className="w-full" onClick={() => setIsFilterDrawerOpen(false)}>
+                Show {processedProducts.length} Results
+              </Button>
             </div>
           </div>
-
-          {/* Prescription Required checkbox */}
-          <div>
-            <h3 className="font-display font-bold text-xs text-txt-title uppercase tracking-wider mb-3">
-              Prescription Rule
-            </h3>
-            <div className="space-y-2.5">
-              <label className="flex items-center gap-2.5 text-sm text-dark-600 dark:text-dark-350 cursor-pointer">
-                <input
-                  type="radio"
-                  name="rx"
-                  checked={rxRequired === null}
-                  onChange={() => setRxRequired(null)}
-                  className="accent-primary-500"
-                />
-                <span>All Products</span>
-              </label>
-              <label className="flex items-center gap-2.5 text-sm text-dark-600 dark:text-dark-350 cursor-pointer">
-                <input
-                  type="radio"
-                  name="rx"
-                  checked={rxRequired === true}
-                  onChange={() => setRxRequired(true)}
-                  className="accent-primary-500"
-                />
-                <span>Prescription (Rx) Required</span>
-              </label>
-              <label className="flex items-center gap-2.5 text-sm text-dark-600 dark:text-dark-350 cursor-pointer">
-                <input
-                  type="radio"
-                  name="rx"
-                  checked={rxRequired === false}
-                  onChange={() => setRxRequired(false)}
-                  className="accent-primary-500"
-                />
-                <span>Over-The-Counter (OTC)</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Price range selector slider */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-display font-bold text-xs text-txt-title uppercase tracking-wider">
-                Max Price
-              </h3>
-              <span className="text-xs font-bold text-primary-500">${priceRange}</span>
-            </div>
-            <input
-              type="range"
-              min="2"
-              max="100"
-              value={priceRange}
-              onChange={(e) => setPriceRange(Number(e.target.value))}
-              className="w-full accent-primary-500 bg-dark-100 dark:bg-dark-800 rounded-lg cursor-pointer h-1.5"
-            />
-          </div>
-
-
         </div>
 
         {/* Product Grid & Controls */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="w-full space-y-6">
           {/* Sorting / Catalog details bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 glass-panel p-4 rounded-2xl">
-            <span className="text-xs font-semibold text-txt-muted">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 glass-panel p-3 sm:p-4 rounded-2xl">
+            {/* Desktop only result count */}
+            <span className="text-xs font-semibold text-txt-muted hidden lg:inline-block">
               Showing {processedProducts.length} medicines
             </span>
 
             {/* Catalog search bar */}
-            <div className="relative w-full sm:w-60">
+            <div className="relative w-full sm:flex-1 sm:max-w-xs">
               <Search
                 size={16}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400"
@@ -253,24 +314,34 @@ const Products = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search catalog..."
-                className="w-full pl-9 pr-4 py-2 rounded-xl bg-bdr-light border border-bdr-main text-xs outline-none text-txt-title focus:border-primary-500"
+                className="w-full pl-9 pr-4 py-2 sm:py-2.5 rounded-xl bg-bdr-light border border-bdr-main text-xs outline-none text-txt-title focus:border-primary-500"
               />
             </div>
 
-            {/* Sort options */}
-            <div className="flex items-center gap-2 shrink-0">
-              <ArrowUpDown size={14} className="text-dark-400" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="text-xs font-semibold bg-transparent outline-none text-dark-800 dark:text-dark-250 cursor-pointer"
+            {/* Filter and Sort Group - side by side on mobile */}
+            <div className="flex items-center justify-between gap-3 w-full sm:w-auto shrink-0">
+              <button 
+                onClick={() => setIsFilterDrawerOpen(true)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-500 text-white px-3 py-2 sm:py-2.5 rounded-xl text-xs font-bold shadow-md shadow-primary-500/20 active:scale-95 transition-all cursor-pointer"
               >
-                <option value="featured">Sort by: Featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Rating Reviews</option>
-                <option value="discount">Biggest Savings</option>
-              </select>
+                <SlidersHorizontal size={14} />
+                Filters
+              </button>
+
+              <div className="flex-1 sm:flex-none flex items-center justify-center sm:justify-start gap-1 sm:gap-2 bg-bdr-light sm:bg-transparent px-2 py-2 sm:px-0 sm:py-0 rounded-xl border border-bdr-main sm:border-none">
+                <ArrowUpDown size={14} className="text-dark-400 hidden sm:block" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full sm:w-auto text-[11px] sm:text-xs font-bold sm:font-semibold bg-transparent outline-none text-txt-title sm:text-dark-800 dark:sm:text-dark-250 cursor-pointer"
+                >
+                  <option value="featured">Sort: Featured</option>
+                  <option value="price-low">Low to High</option>
+                  <option value="price-high">High to Low</option>
+                  <option value="rating">Reviews</option>
+                  <option value="discount">Savings</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -280,7 +351,7 @@ const Products = () => {
               Loading products inventory...
             </div>
           ) : processedProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
               {processedProducts.map((prod) => (
                 <ProductCard key={prod._id} product={prod} />
               ))}

@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getProductByIdApi, getProductReviewsApi, createReviewApi, getErrorMessage } from '../utils/api.js';
 import { addToCart, clearCart } from '../features/cart/cartSlice.js';
 import { toggleWishlist } from '../features/cart/wishlistSlice.js';
+import { showLoginModal } from '../features/auth/authSlice.js';
 import { useToast } from '../components/ui/Toast.jsx';
 import Button from '../components/ui/Button.jsx';
 
@@ -27,6 +28,7 @@ const ProductDetails = () => {
   const dispatch = useDispatch();
   const { showToast } = useToast();
 
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const isWishlisted = wishlistItems.some((item) => item._id === id);
 
@@ -81,23 +83,39 @@ const ProductDetails = () => {
   const discountedPrice = product.price * (1 - (product.discount || 0) / 100);
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      dispatch(showLoginModal());
+      return;
+    }
     dispatch(addToCart({ product, quantity }));
     showToast(`Added ${quantity} ${product.name} to cart`, 'success');
   };
 
   const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      dispatch(showLoginModal());
+      return;
+    }
     dispatch(clearCart());
     dispatch(addToCart({ product, quantity }));
     navigate('/checkout');
   };
 
   const handleToggleWishlist = () => {
+    if (!isAuthenticated) {
+      dispatch(showLoginModal());
+      return;
+    }
     dispatch(toggleWishlist(product));
     showToast(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist', 'success');
   };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      dispatch(showLoginModal());
+      return;
+    }
     if (!userComment.trim()) return;
 
     try {

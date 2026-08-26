@@ -27,11 +27,6 @@ import Button from '../components/ui/Button.jsx';
 const Home = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/register" replace />;
-  }
-
   // Banner State
   const [currentBanner, setCurrentBanner] = useState(0);
 
@@ -84,11 +79,11 @@ const Home = () => {
     <div className="flex flex-col gap-20 pb-20">
       {/* 1. Hero Promo Banner Slider */}
       {bannersLoading ? (
-        <div className="w-full h-137.5 bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
+        <div className="w-full h-87.5 sm:h-[450px] lg:h-[550px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
           Loading promotions...
         </div>
       ) : banners.length > 0 ? (
-        <div className="relative w-full h-137.5 overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
+        <div className="relative w-full h-87.5 sm:h-[450px] lg:h-[550px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentBanner}
@@ -111,28 +106,28 @@ const Home = () => {
               }}
               className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing select-none"
             >
-              {/* Blending Gradient Overlay - Adapts seamlessly to light/dark panel theme */}
-              <div className="absolute inset-0 bg-gradient-to-r from-bg-panel via-bg-panel/75 to-transparent z-10 pointer-events-none" />
+              {/* Blending Gradient Overlay - Enhances text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
               {banners[currentBanner] && (
                 <>
                   <img
                     src={banners[currentBanner].image}
                     alt="Healthcare Banner"
-                    className="w-full h-full object-cover opacity-85 dark:opacity-75 pointer-events-none"
+                    className="absolute inset-0 w-full h-full object-cover z-0"
                   />
                   {/* Banner Captions */}
-                  <div className="absolute inset-y-0 left-0 flex flex-col justify-center items-start text-left pl-8 sm:pl-16 pr-6 z-20 max-w-2xl">
-                    <span className="px-3.5 py-1.5 rounded-lg bg-primary-500/10 border border-primary-500/20 text-primary-600 dark:text-primary-400 text-xs font-bold uppercase tracking-wider mb-4 font-display">
+                  <div className="absolute inset-y-0 left-0 flex flex-col justify-end pb-12 sm:pb-24 lg:pb-32 items-start text-left pl-10 sm:pl-20 pr-6 z-20 max-w-2xl">
+                    <span className="px-3.5 py-1.5 rounded-lg bg-primary-500/20 backdrop-blur-md border border-primary-500/40 text-primary-300 text-xs font-bold uppercase tracking-wider mb-3 sm:mb-5 font-display shadow-sm">
                       Medical Excellence
                     </span>
-                    <h1 className="font-display font-extrabold text-3xl sm:text-5xl leading-tight text-txt-title m-0">
+                    <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl leading-[1.1] text-white m-0 drop-shadow-lg line-clamp-3">
                       {banners[currentBanner].title}
                     </h1>
-                    <p className="text-sm sm:text-base text-txt-muted mt-4 mb-8 leading-relaxed">
+                    <p className="text-sm sm:text-lg text-gray-200 mt-3 mb-5 sm:mt-5 sm:mb-8 leading-relaxed font-medium max-w-lg drop-shadow-md line-clamp-2 sm:line-clamp-3">
                       {banners[currentBanner].subtitle}
                     </p>
                     <Link to={banners[currentBanner].link}>
-                      <Button variant="primary" size="lg">
+                      <Button variant="primary" size="lg" className="shadow-lg shadow-primary-500/30 hover:scale-105 transition-transform duration-300">
                         Shop Products
                       </Button>
                     </Link>
@@ -210,13 +205,15 @@ const Home = () => {
       {/* 4. Why Choose Us Section */}
       <div className="bg-primary-500/5 dark:bg-primary-950/10 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold text-primary-500 uppercase tracking-widest font-display">
-              Core Benefits
-            </span>
-            <h2 className="text-3xl font-extrabold font-display text-txt-title mt-1">
-              Why Choose CuraCare
-            </h2>
+          <div className="flex justify-between items-end mb-8">
+            <div>
+              <span className="text-xs font-bold text-primary-500 uppercase tracking-widest font-display">
+                Core Benefits
+              </span>
+              <h2 className="text-3xl font-extrabold font-display text-txt-title mt-1">
+                Why Choose CuraCare
+              </h2>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
@@ -278,7 +275,7 @@ const Home = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
           {productsLoading ? (
             <div className="col-span-full text-center py-6 text-txt-muted text-sm">Loading products...</div>
           ) : (
@@ -291,13 +288,15 @@ const Home = () => {
 
       {/* 6. Testimonials Section */}
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-left">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-bold text-primary-500 uppercase tracking-widest font-display">
-            Patient Stories
-          </span>
-          <h2 className="text-3xl font-extrabold font-display text-txt-title mt-1">
-            What Our Customers Say
-          </h2>
+        <div className="flex justify-between items-end mb-8">
+          <div>
+            <span className="text-xs font-bold text-primary-500 uppercase tracking-widest font-display">
+              Patient Stories
+            </span>
+            <h2 className="text-3xl font-extrabold font-display text-txt-title mt-1">
+              What Our Customers Say
+            </h2>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">

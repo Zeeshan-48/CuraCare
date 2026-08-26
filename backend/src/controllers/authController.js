@@ -1,9 +1,8 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
-import sendEmail from '../utils/sendEmail.js';
 import { OAuth2Client } from 'google-auth-library';
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+let client;
 
 // Helper to generate JWT Token
 const generateToken = (id) => {
@@ -40,27 +39,7 @@ export const register = async (req, res, next) => {
     });
 
     if (user) {
-      // Send registration OTP email
-      const emailOptions = {
-        email: user.email,
-        subject: 'CuraCare Account Verification Code',
-        message: `Welcome to CuraCare! Your verification code is ${verificationOTP}. It expires in 10 minutes.`,
-        html: `
-          <h3>Welcome to CuraCare!</h3>
-          <p>Thank you for registering. Please use the verification code below to activate your account:</p>
-          <h2 style="color: #0d9488; font-size: 28px; letter-spacing: 4px;">${verificationOTP}</h2>
-          <p>This code will expire in 10 minutes.</p>
-        `,
-      };
-
-      const emailSent = await sendEmail(emailOptions);
-      if (!emailSent) {
-        console.log(`[DEV MODE] Verification OTP for ${user.email} is: ${verificationOTP}`);
-        if (process.env.NODE_ENV === 'production') {
-          res.status(500);
-          return next(new Error('Failed to send verification email. Please check your SMTP configuration.'));
-        }
-      }
+      console.log(`Verification OTP for ${user.email} is: ${verificationOTP}`);
 
       // For development speed, register logs in directly and returns verified token if required,
       // but let's return the token and user profile immediately as frontend expects.
@@ -73,9 +52,10 @@ export const register = async (req, res, next) => {
           role: user.role,
           profileImage: user.profileImage,
           isVerified: user.isVerified,
+          address: user.address || {},
         },
         token: generateToken(user._id),
-        otp: process.env.NODE_ENV === 'development' ? verificationOTP : undefined,
+        otp: verificationOTP,
       });
     } else {
       res.status(400);
@@ -109,6 +89,7 @@ export const login = async (req, res, next) => {
           role: user.role,
           profileImage: user.profileImage,
           isVerified: user.isVerified,
+          address: user.address || {},
         },
         token: generateToken(user._id),
       });
@@ -159,6 +140,7 @@ export const verifyOTP = async (req, res, next) => {
           role: user.role,
           profileImage: user.profileImage,
           isVerified: user.isVerified,
+          address: user.address || {},
         },
       });
     } else {
@@ -189,32 +171,12 @@ export const forgotPassword = async (req, res, next) => {
     user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 mins expiry
     await user.save();
 
-    // Send email
-    const emailOptions = {
-      email: user.email,
-      subject: 'CuraCare Password Reset Code',
-      message: `You requested a password reset. Your OTP verification code is ${resetOTP}. It expires in 15 minutes.`,
-      html: `
-        <h3>CuraCare Password Reset</h3>
-        <p>Please use the code below to reset your password:</p>
-        <h2 style="color: #0d9488; font-size: 28px; letter-spacing: 4px;">${resetOTP}</h2>
-        <p>This code will expire in 15 minutes.</p>
-      `,
-    };
-
-    const emailSent = await sendEmail(emailOptions);
-    if (!emailSent) {
-      console.log(`[DEV MODE] Password Reset OTP for ${user.email} is: ${resetOTP}`);
-      if (process.env.NODE_ENV === 'production') {
-        res.status(500);
-        return next(new Error('Failed to send password reset OTP. Please check your SMTP configuration.'));
-      }
-    }
+    console.log(`Password Reset OTP for ${user.email} is: ${resetOTP}`);
 
     res.json({
       success: true,
-      message: 'OTP verification code sent to your email.',
-      otp: process.env.NODE_ENV === 'development' ? resetOTP : undefined,
+      message: 'OTP verification code generated.',
+      otp: resetOTP,
     });
   } catch (error) {
     next(error);
@@ -277,6 +239,7 @@ export const getProfile = async (req, res, next) => {
         role: user.role,
         profileImage: user.profileImage,
         isVerified: user.isVerified,
+        address: user.address || {},
       });
     } else {
       res.status(404);
@@ -299,6 +262,16 @@ export const updateProfile = async (req, res, next) => {
       user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
       user.profileImage = req.body.profileImage !== undefined ? req.body.profileImage : user.profileImage;
 
+      if (req.body.address) {
+        user.address = {
+          street: req.body.address.street !== undefined ? req.body.address.street : user.address?.street,
+          city: req.body.address.city !== undefined ? req.body.address.city : user.address?.city,
+          state: req.body.address.state !== undefined ? req.body.address.state : user.address?.state,
+          postalCode: req.body.address.postalCode !== undefined ? req.body.address.postalCode : user.address?.postalCode,
+          country: req.body.address.country !== undefined ? req.body.address.country : user.address?.country,
+        };
+      }
+
       if (req.body.password) {
         user.password = req.body.password;
       }
@@ -313,6 +286,7 @@ export const updateProfile = async (req, res, next) => {
         role: updatedUser.role,
         profileImage: updatedUser.profileImage,
         isVerified: updatedUser.isVerified,
+        address: updatedUser.address || {},
       });
     } else {
       res.status(404);
@@ -348,32 +322,12 @@ export const resendOTP = async (req, res, next) => {
     user.verificationOTPExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
 
-    // Send email
-    const emailOptions = {
-      email: user.email,
-      subject: 'CuraCare Account Verification Code',
-      message: `Your new verification code is ${verificationOTP}. It expires in 10 minutes.`,
-      html: `
-        <h3>CuraCare Account Verification</h3>
-        <p>A new verification code was requested. Please use this code to activate your account:</p>
-        <h2 style="color: #0d9488; font-size: 28px; letter-spacing: 4px;">${verificationOTP}</h2>
-        <p>This code will expire in 10 minutes.</p>
-      `,
-    };
-
-    const emailSent = await sendEmail(emailOptions);
-    if (!emailSent) {
-      console.log(`[DEV MODE] Resent Verification OTP for ${user.email} is: ${verificationOTP}`);
-      if (process.env.NODE_ENV === 'production') {
-        res.status(500);
-        return next(new Error('Failed to send verification email. Please check your SMTP configuration.'));
-      }
-    }
+    console.log(`Resent Verification OTP for ${user.email} is: ${verificationOTP}`);
 
     res.json({
       success: true,
-      message: 'A new verification OTP code has been sent to your email.',
-      otp: process.env.NODE_ENV === 'development' ? verificationOTP : undefined,
+      message: 'A new verification OTP code has been generated.',
+      otp: verificationOTP,
     });
   } catch (error) {
     next(error);
@@ -387,15 +341,29 @@ export const googleLogin = async (req, res, next) => {
   const { token } = req.body;
 
   try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+    
+    if (!clientId) {
+      throw new Error('Server misconfiguration: GOOGLE_CLIENT_ID is missing or undefined.');
+    }
 
-    const payload = ticket.getPayload();
+    // Verify token using Google's tokeninfo endpoint to bypass local Windows clock skew issues
+    // (google-auth-library strictly fails if the local machine time is even slightly behind Google's)
+    const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
+    const payload = await googleRes.json();
+
+    if (!googleRes.ok) {
+      throw new Error(payload.error_description || 'Failed to verify token with Google');
+    }
+
+    if (payload.aud !== clientId) {
+      throw new Error('Wrong recipient, payload audience != requiredAudience');
+    }
+
     const { email, name, picture, email_verified } = payload;
+    const isEmailVerified = email_verified === true || email_verified === 'true';
 
-    if (!email_verified) {
+    if (!isEmailVerified) {
       res.status(400);
       return next(new Error('Google email is not verified'));
     }
@@ -425,11 +393,13 @@ export const googleLogin = async (req, res, next) => {
         role: user.role,
         profileImage: user.profileImage || picture,
         isVerified: user.isVerified,
+        address: user.address || {},
       },
       token: generateToken(user._id),
     });
   } catch (error) {
+    console.error('Google login error:', error);
     res.status(401);
-    next(new Error('Invalid Google token'));
+    next(new Error('Invalid Google token: ' + error.message));
   }
 };

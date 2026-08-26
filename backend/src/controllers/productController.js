@@ -330,8 +330,9 @@ Product Catalog:
 ${JSON.stringify(catalog)}`;
 
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+      let response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -345,6 +346,25 @@ ${JSON.stringify(catalog)}`;
           }),
         }
       );
+
+      // Fallback model if primary model returns 404
+      if (!response.ok && response.status === 404 && model !== 'gemini-3.5-flash') {
+        response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: 'user',
+                  parts: [{ text: `${systemPrompt}\n\nUser Symptoms:\n${symptomInput}` }],
+                },
+              ],
+            }),
+          }
+        );
+      }
 
       const data = await response.json();
       if (!response.ok) {
