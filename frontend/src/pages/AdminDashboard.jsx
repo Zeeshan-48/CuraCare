@@ -826,12 +826,14 @@ const AdminDashboard = () => {
           <Input
             label="Product Name"
             name="name"
+            placeholder="e.g. Paracetamol 500mg"
             defaultValue={editingProduct ? (editingProduct.name || '') : (productForm.formData.name || '')}
             required
           />
           <Input
             label="Generic Name (Formula)"
             name="genericName"
+            placeholder="e.g. Acetaminophen"
             defaultValue={editingProduct ? (editingProduct.genericName || '') : (productForm.formData.genericName || '')}
             required
           />
@@ -839,6 +841,7 @@ const AdminDashboard = () => {
             <Input 
               label="Brand" 
               name="brand" 
+              placeholder="e.g. Panadol"
               defaultValue={editingProduct ? (editingProduct.brand || '') : (productForm.formData.brand || '')} 
               required 
             />
@@ -864,10 +867,11 @@ const AdminDashboard = () => {
 
           <div className="grid grid-cols-3 gap-4">
             <Input
-              label="Price ($)"
+              label="Price (₹)"
               name="price"
               type="number"
               step="0.01"
+              placeholder="e.g. 150"
               defaultValue={editingProduct ? (editingProduct.price || '') : (productForm.formData.price || '')}
               required
             />
@@ -875,6 +879,7 @@ const AdminDashboard = () => {
               label="Stock"
               name="stock"
               type="number"
+              placeholder="e.g. 100"
               defaultValue={editingProduct ? (editingProduct.stock || '') : (productForm.formData.stock || '')}
               required
             />
@@ -882,6 +887,7 @@ const AdminDashboard = () => {
               label="Discount (%)"
               name="discount"
               type="number"
+              placeholder="e.g. 10"
               defaultValue={editingProduct ? (editingProduct.discount || '0') : (productForm.formData.discount || '0')}
             />
           </div>
@@ -904,6 +910,7 @@ const AdminDashboard = () => {
             <Input
               label="Batch Number"
               name="batchNumber"
+              placeholder="e.g. BATCH123"
               defaultValue={editingProduct ? (editingProduct.batchNumber || '') : (productForm.formData.batchNumber || '')}
             />
             <div>
@@ -943,6 +950,7 @@ const AdminDashboard = () => {
             <textarea
               name="description"
               rows="3"
+              placeholder="e.g. Used to treat mild to moderate pain..."
               defaultValue={editingProduct ? (editingProduct.description || '') : (productForm.formData.description || '')}
               className="form-input text-sm resize-none"
               required
@@ -955,6 +963,7 @@ const AdminDashboard = () => {
               <textarea
                 name="uses"
                 rows="2"
+                placeholder="e.g. Pain relief, Fever"
                 defaultValue={editingProduct ? (editingProduct.uses || '') : (productForm.formData.uses || '')}
                 className="form-input text-xs resize-none"
                 required
@@ -965,6 +974,7 @@ const AdminDashboard = () => {
               <textarea
                 name="sideEffects"
                 rows="2"
+                placeholder="e.g. Nausea, Rash"
                 defaultValue={editingProduct ? (editingProduct.sideEffects || '') : (productForm.formData.sideEffects || '')}
                 className="form-input text-xs resize-none"
                 required
@@ -975,6 +985,7 @@ const AdminDashboard = () => {
               <textarea
                 name="dosage"
                 rows="2"
+                placeholder="e.g. 1-2 tablets every 4-6 hours"
                 defaultValue={editingProduct ? (editingProduct.dosage || '') : (productForm.formData.dosage || '')}
                 className="form-input text-xs resize-none"
                 required
