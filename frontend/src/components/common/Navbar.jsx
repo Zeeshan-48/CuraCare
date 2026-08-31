@@ -237,15 +237,9 @@ const Navbar = () => {
                 <div className="flex items-center gap-3">
                   <Link
                     to="/login"
-                    className="font-display text-sm font-semibold text-txt-main hover:text-primary-500 transition-colors px-2 py-1"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    to="/register"
                     className="font-display text-sm font-semibold px-5 py-2.5 rounded-xl bg-linear-to-tr from-primary-600 to-primary-400 hover:from-primary-700 hover:to-primary-550 text-white shadow-md shadow-primary-500/10 hover:shadow-lg hover:shadow-primary-500/15 hover:scale-[1.015] active:scale-95 transition-all duration-200"
                   >
-                    Sign Up
+                    Sign In
                   </Link>
                 </div>
               )}
@@ -415,20 +409,13 @@ const Navbar = () => {
                 </button>
               </>
             ) : (
-              <div className="grid grid-cols-2 gap-3 px-2 pt-2">
+              <div className="px-2 pt-2">
                 <Link
                   to="/login"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center py-3 rounded-xl border border-bdr-main font-display text-sm font-semibold text-txt-main hover:bg-primary-50 dark:hover:bg-dark-900 transition-colors"
+                  className="w-full flex items-center justify-center py-3 rounded-xl bg-primary-500 font-display text-sm font-semibold text-white shadow-md shadow-primary-500/10 hover:bg-primary-600 transition-colors"
                 >
                   Sign In
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center py-3 rounded-xl bg-primary-500 font-display text-sm font-semibold text-white shadow-md shadow-primary-500/10 hover:bg-primary-600 transition-colors"
-                >
-                  Sign Up
                 </Link>
               </div>
             )}

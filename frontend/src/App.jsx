@@ -20,10 +20,6 @@ import FAQs from './pages/FAQs.jsx';
 import Privacy from './pages/Privacy.jsx';
 import Terms from './pages/Terms.jsx';
 import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import ForgotPassword from './pages/ForgotPassword.jsx';
-import ResetPassword from './pages/ResetPassword.jsx';
-import VerifyEmail from './pages/VerifyEmail.jsx';
 import Cart from './pages/Cart.jsx';
 import Checkout from './pages/Checkout.jsx';
 import Profile from './pages/Profile.jsx';
@@ -65,13 +61,13 @@ function App() {
                 <Route path="terms-conditions" element={<Terms />} />
                 <Route path="wishlist" element={<Wishlist />} />
                 
-                {/* Authentication Routes */}
+                {/* Authentication Routes (Google Login Only) */}
                 <Route path="login" element={<Login />} />
-                <Route path="register" element={<Register />} />
-                <Route path="signup" element={<Navigate to="/register" replace />} />
-                <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="reset-password" element={<ResetPassword />} />
-                <Route path="verify-email" element={<VerifyEmail />} />
+                <Route path="register" element={<Navigate to="/login" replace />} />
+                <Route path="signup" element={<Navigate to="/login" replace />} />
+                <Route path="forgot-password" element={<Navigate to="/login" replace />} />
+                <Route path="reset-password" element={<Navigate to="/login" replace />} />
+                <Route path="verify-email" element={<Navigate to="/login" replace />} />
 
                 {/* Protected Customer Routes */}
                 <Route

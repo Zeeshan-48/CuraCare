@@ -1,41 +1,20 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Eye, EyeOff } from 'lucide-react';
-
 import { authStart, authSuccess, authFailure, hideLoginModal } from '../../features/auth/authSlice.js';
-import { loginApi, googleLoginApi, getErrorMessage } from '../../utils/api.js';
+import { googleLoginApi, getErrorMessage } from '../../utils/api.js';
 import { GoogleLogin } from '@react-oauth/google';
 import { syncCartWithBackend } from '../../features/cart/cartSlice.js';
 import { useToast } from '../ui/Toast.jsx';
-import Input from '../ui/Input.jsx';
-import Button from '../ui/Button.jsx';
 import Modal from '../ui/Modal.jsx';
-
-// Zod Schema
-const loginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
+import InAppBrowserNotice from '../common/InAppBrowserNotice.jsx';
 
 const LoginModal = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, isLoginModalOpen } = useSelector((state) => state.auth);
+  const { isLoginModalOpen } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { showToast } = useToast();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(loginSchema),
-  });
 
   const handleClose = () => {
     dispatch(hideLoginModal());
@@ -64,83 +43,28 @@ const LoginModal = () => {
     showToast('Google Sign-In failed. Please try again.', 'error');
   };
 
-  const onSubmit = async (data) => {
-    dispatch(authStart());
-    try {
-      const response = await loginApi(data.email, data.password);
-      dispatch(authSuccess(response));
-      showToast(`Welcome back, ${response.user.name}!`, 'success');
-      dispatch(syncCartWithBackend());
-      handleClose();
-
-      if (response.user.role === 'admin') {
-        navigate('/admin');
-      }
-    } catch (error) {
-      const errorMsg = getErrorMessage(error);
-      dispatch(authFailure(errorMsg));
-      showToast(errorMsg, 'error');
-      
-      if (error.response && error.response.status === 403) {
-        handleClose();
-        navigate('/verify-email', { state: { email: data.email } });
-      }
-    }
-  };
-
   return (
-    <Modal isOpen={isLoginModalOpen} onClose={handleClose} title="Sign In to Continue" size="sm">
-      <div className="flex flex-col">
-        <div className="text-center mb-6">
-          <p className="text-sm text-txt-muted">
-            Please log in to add items to your cart and complete your purchase.
-          </p>
+    <Modal isOpen={isLoginModalOpen} onClose={handleClose} title="Sign In to CuraCare" size="sm">
+      <div className="flex flex-col items-center text-center py-2">
+        <div className="w-12 h-12 rounded-2xl bg-white shadow-md shadow-primary-500/15 flex items-center justify-center mb-4 border border-bdr-main/20">
+          <img
+            src="/logo.png"
+            alt="CuraCare Icon"
+            className="w-10 h-10 object-contain scale-[1.1]"
+          />
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Input
-            label="Email Address"
-            type="email"
-            placeholder="john@example.com"
-            error={errors.email?.message}
-            {...register('email')}
-          />
+        <h3 className="font-display font-bold text-lg text-txt-title mb-1">
+          Continue with Google
+        </h3>
+        <p className="text-xs text-txt-muted max-w-xs mb-4">
+          Sign in or create an account with Google to manage your cart, orders, and prescriptions seamlessly.
+        </p>
 
-          <Input
-            label="Password"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="••••••••"
-            rightIcon={showPassword ? EyeOff : Eye}
-            onRightIconClick={() => setShowPassword(!showPassword)}
-            error={errors.password?.message}
-            {...register('password')}
-          />
+        {/* In-App Browser detection & platform selection */}
+        <InAppBrowserNotice className="mb-4" />
 
-          <div className="flex items-center justify-end text-sm">
-            <Link
-              to="/forgot-password"
-              onClick={handleClose}
-              className="font-medium text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 font-display transition-colors"
-            >
-              Forgot Password?
-            </Link>
-          </div>
-
-          <Button type="submit" variant="primary" className="w-full mt-4" isLoading={isLoading}>
-            Sign In
-          </Button>
-        </form>
-
-        <div className="relative my-5">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-bdr-light"></div>
-          </div>
-          <div className="relative flex justify-center text-[10px] uppercase tracking-wider font-bold">
-            <span className="bg-bg-panel px-3 text-txt-muted">Or continue with</span>
-          </div>
-        </div>
-
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center w-full py-1">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleError}
@@ -149,17 +73,6 @@ const LoginModal = () => {
             shape="rectangular"
             size="large"
           />
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-bdr-light text-center text-sm">
-          <span className="text-txt-muted">Don't have an account? </span>
-          <Link
-            to="/register"
-            onClick={handleClose}
-            className="font-semibold text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 font-display transition-colors"
-          >
-            Sign Up
-          </Link>
         </div>
       </div>
     </Modal>

@@ -3,24 +3,50 @@ node_modules/
 backend/node_modules/
 frontend/node_modules/
 
-# Local Environment Variables
+# Environment Variables & Secrets
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 backend/.env
+backend/.env.*
+!backend/.env.example
 frontend/.env
+frontend/.env.*
+!frontend/.env.example
 
-# Production Builds
+# Production & Build Outputs
 dist/
+dist-ssr/
 frontend/dist/
 backend/dist/
+build/
+.output/
 
-# System Files
-.DS_Store
-Thumbs.db
-.vscode/
+# Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor & IDE files
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# System & OS Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+
+# Coverage and Test Output
+coverage/
+.nyc_output/

@@ -76,14 +76,14 @@ const Home = () => {
   }, [banners.length]);
 
   return (
-    <div className="flex flex-col gap-20 pb-20">
+    <div className="flex flex-col gap-8 sm:gap-10 lg:gap-12 pb-20">
       {/* 1. Hero Promo Banner Slider */}
       {bannersLoading ? (
-        <div className="w-full h-87.5 sm:h-[/450px] lg:h-[550px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
+        <div className="w-full h-[340px] sm:h-[380px] lg:h-[420px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
           Loading promotions...
         </div>
       ) : banners.length > 0 ? (
-        <div className="relative w-full h-87.5 sm:h-[/450px] lg:h-[/550px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
+        <div className="relative w-full h-[340px] sm:h-[380px] lg:h-[420px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentBanner}
@@ -107,7 +107,7 @@ const Home = () => {
               className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing select-none"
             >
               {/* Blending Gradient Overlay - Enhances text readability */}
-              <div className="absolute inset-0 .bg-gradient-to-r from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent z-10 pointer-events-none" />
               {banners[currentBanner] && (
                 <>
                   <img
@@ -116,18 +116,18 @@ const Home = () => {
                     className="absolute inset-0 w-full h-full object-cover z-0"
                   />
                   {/* Banner Captions */}
-                  <div className="absolute inset-y-0 left-0 flex flex-col justify-end pb-12 sm:pb-24 lg:pb-32 items-start text-left pl-10 sm:pl-20 pr-6 z-20 max-w-2xl">
-                    <span className="px-3.5 py-1.5 rounded-lg bg-primary-500/20 backdrop-blur-md border border-primary-500/40 text-primary-300 text-xs font-bold uppercase tracking-wider mb-3 sm:mb-5 font-display shadow-sm">
+                  <div className="absolute inset-y-0 left-0 flex flex-col justify-end lg:justify-center pb-8 sm:pb-12 lg:pb-0 items-start text-left pl-8 sm:pl-16 lg:pl-16 pr-6 lg:pr-12 z-20 max-w-xl lg:max-w-2xl">
+                    <span className="px-3 py-1 rounded-lg bg-primary-500/20 backdrop-blur-md border border-primary-500/40 text-primary-300 text-[11px] font-bold uppercase tracking-wider mb-2 sm:mb-3 lg:mb-3 font-display shadow-sm">
                       Medical Excellence
                     </span>
-                    <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl leading-[1.1] text-white m-0 drop-shadow-lg line-clamp-3">
+                    <h1 className="font-display font-extrabold text-2xl sm:text-4xl lg:text-4xl xl:text-[42px] leading-[1.15] text-white m-0 drop-shadow-lg line-clamp-2 lg:line-clamp-none">
                       {banners[currentBanner].title}
                     </h1>
-                    <p className="text-sm sm:text-lg text-gray-200 mt-3 mb-5 sm:mt-5 sm:mb-8 leading-relaxed font-medium max-w-lg drop-shadow-md line-clamp-2 sm:line-clamp-3">
+                    <p className="text-xs sm:text-base text-gray-200 mt-2 mb-4 sm:mt-3 sm:mb-5 lg:mt-3 lg:mb-5 leading-relaxed font-medium max-w-lg lg:max-w-xl drop-shadow-md line-clamp-2 sm:line-clamp-3 lg:line-clamp-none">
                       {banners[currentBanner].subtitle}
                     </p>
                     <Link to={banners[currentBanner].link}>
-                      <Button variant="primary" size="lg" className="shadow-lg shadow-primary-500/30 hover:scale-105 transition-transform duration-300">
+                      <Button variant="primary" size="md" className="shadow-lg shadow-primary-500/30 hover:scale-105 transition-transform duration-300">
                         Shop Products
                       </Button>
                     </Link>
