@@ -79,11 +79,11 @@ const Home = () => {
     <div className="flex flex-col gap-20 pb-20">
       {/* 1. Hero Promo Banner Slider */}
       {bannersLoading ? (
-        <div className="w-full h-[380px] sm:h-[450px] lg:h-[500px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
+        <div className="w-full h-87.5 sm:h-[/450px] lg:h-[550px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
           Loading promotions...
         </div>
       ) : banners.length > 0 ? (
-        <div className="relative w-full h-[380px] sm:h-[450px] lg:h-[500px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
+        <div className="relative w-full h-87.5 sm:h-[/450px] lg:h-[/550px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentBanner}
@@ -107,7 +107,7 @@ const Home = () => {
               className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing select-none"
             >
               {/* Blending Gradient Overlay - Enhances text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent z-10 pointer-events-none" />
+              <div className="absolute inset-0 .bg-gradient-to-r from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
               {banners[currentBanner] && (
                 <>
                   <img
@@ -116,14 +116,14 @@ const Home = () => {
                     className="absolute inset-0 w-full h-full object-cover z-0"
                   />
                   {/* Banner Captions */}
-                  <div className="absolute inset-y-0 left-0 flex flex-col justify-center items-start text-left pl-8 sm:pl-16 lg:pl-20 pr-6 z-20 max-w-2xl">
-                    <span className="px-3.5 py-1.5 rounded-lg bg-primary-500/20 backdrop-blur-md border border-primary-500/40 text-primary-300 text-xs font-bold uppercase tracking-wider mb-3 sm:mb-4 font-display shadow-sm inline-block">
+                  <div className="absolute inset-y-0 left-0 flex flex-col justify-end pb-12 sm:pb-24 lg:pb-32 items-start text-left pl-10 sm:pl-20 pr-6 z-20 max-w-2xl">
+                    <span className="px-3.5 py-1.5 rounded-lg bg-primary-500/20 backdrop-blur-md border border-primary-500/40 text-primary-300 text-xs font-bold uppercase tracking-wider mb-3 sm:mb-5 font-display shadow-sm">
                       Medical Excellence
                     </span>
-                    <h1 className="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl leading-tight text-white m-0 drop-shadow-lg line-clamp-2 sm:line-clamp-3">
+                    <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl leading-[1.1] text-white m-0 drop-shadow-lg line-clamp-3">
                       {banners[currentBanner].title}
                     </h1>
-                    <p className="text-xs sm:text-base lg:text-lg text-gray-200 mt-2.5 mb-4 sm:mt-4 sm:mb-6 leading-relaxed font-medium max-w-lg drop-shadow-md line-clamp-2 sm:line-clamp-3">
+                    <p className="text-sm sm:text-lg text-gray-200 mt-3 mb-5 sm:mt-5 sm:mb-8 leading-relaxed font-medium max-w-lg drop-shadow-md line-clamp-2 sm:line-clamp-3">
                       {banners[currentBanner].subtitle}
                     </p>
                     <Link to={banners[currentBanner].link}>

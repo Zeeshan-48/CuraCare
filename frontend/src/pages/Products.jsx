@@ -166,7 +166,7 @@ const Products = () => {
       <div className="relative">
         
         {/* Sidebar Filters Drawer */}
-        <div className={`fixed inset-0 z-[100] transition-opacity duration-300 ${isFilterDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`fixed inset-0 z-[/100] transition-opacity duration-300 ${isFilterDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           {/* Overlay */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsFilterDrawerOpen(false)} />
           
