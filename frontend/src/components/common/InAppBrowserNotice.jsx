@@ -41,7 +41,7 @@ const InAppBrowserNotice = ({ className = '' }) => {
 
   return (
     <div className={`w-full mb-6 ${className}`}>
-      <div className="p-5 rounded-3xl bg-gradient-to-br from-amber-500/10 via-primary-500/10 to-transparent border border-amber-500/30 text-left shadow-lg shadow-amber-500/5">
+      <div className="p-5 rounded-3xl .bg-gradient-to-br from-amber-500/10 via-primary-500/10 to-transparent border border-amber-500/30 text-left shadow-lg shadow-amber-500/5">
         <div className="flex items-start gap-3.5">
           <div className="p-2.5 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5">
             <Compass size={22} className="animate-pulse" />
