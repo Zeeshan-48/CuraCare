@@ -45,7 +45,7 @@ const InAppBrowserNotice = ({ className = '' }) => {
 
   return (
     <>
-      <div className={`p-4 rounded-2xl .bg-gradient-to-r from-primary-500/10 via-primary-500/5 to-transparent border border-primary-500/30 text-left mb-6 shadow-sm ${className}`}>
+      <div className={`p-4 rounded-2xl bg-gradient-to-r from-primary-500/10 via-primary-500/5 to-transparent border border-primary-500/30 text-left mb-6 shadow-sm ${className}`}>
         <div className="flex items-start gap-3">
           <div className="p-2.5 rounded-xl bg-primary-500/20 text-primary-500 shrink-0 mt-0.5">
             <Compass size={20} className="animate-pulse" />
@@ -59,7 +59,7 @@ const InAppBrowserNotice = ({ className = '' }) => {
                 Google Login
               </span>
             </div>
-
+            
             <p className="text-xs text-txt-muted mt-1 leading-relaxed">
               Google restricts OAuth logins inside {appName}'s in-app browser. Tap below to switch to your default browser for seamless <strong>Google Sign-In</strong>:
             </p>
