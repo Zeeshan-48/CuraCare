@@ -79,11 +79,11 @@ const Home = () => {
     <div className="flex flex-col gap-20 pb-20">
       {/* 1. Hero Promo Banner Slider */}
       {bannersLoading ? (
-        <div className="w-full h-87.5 sm:h-[450px] lg:h-[550px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
+        <div className="w-full h-87.5 sm:h-[/450px] lg:h-[550px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
           Loading promotions...
         </div>
       ) : banners.length > 0 ? (
-        <div className="relative w-full h-87.5 sm:h-[450px] lg:h-[550px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
+        <div className="relative w-full h-87.5 sm:h-[/450px] lg:h-[/550px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentBanner}
@@ -107,7 +107,7 @@ const Home = () => {
               className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing select-none"
             >
               {/* Blending Gradient Overlay - Enhances text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
+              <div className="absolute inset-0 .bg-gradient-to-r from-black/90 via-black/50 to-transparent z-10 pointer-events-none" />
               {banners[currentBanner] && (
                 <>
                   <img

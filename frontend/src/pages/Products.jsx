@@ -11,7 +11,7 @@ const Products = () => {
 
   // Filter States
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [priceRange, setPriceRange] = useState(100); // Max ₹100
+  const [priceRange, setPriceRange] = useState(100); // Max $100
   const [rxRequired, setRxRequired] = useState(null); // null = all, true = Rx, false = OTC
   const [sortBy, setSortBy] = useState('featured');
   const [searchQuery, setSearchQuery] = useState('');
@@ -166,7 +166,7 @@ const Products = () => {
       <div className="relative">
         
         {/* Sidebar Filters Drawer */}
-        <div className={`fixed inset-0 z-[100] transition-opacity duration-300 ${isFilterDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`fixed inset-0 z-[/100] transition-opacity duration-300 ${isFilterDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           {/* Overlay */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsFilterDrawerOpen(false)} />
           
@@ -266,7 +266,7 @@ const Products = () => {
                 >
                   Max Price
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-primary-500">₹{priceRange}</span>
+                    <span className="text-xs font-bold text-primary-500">${priceRange}</span>
                     <ChevronDown size={16} className={`transition-transform duration-300 ${openSections.price ? 'rotate-180 text-primary-500' : 'text-dark-400'}`} />
                   </div>
                 </button>

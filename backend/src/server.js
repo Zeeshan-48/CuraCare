@@ -107,6 +107,15 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/health-tips', healthTipRoutes);
 
+// Health Check Endpoint (Lightweight for uptime monitors like UptimeRobot, cron-job.org)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Root Endpoint
 app.get('/', (req, res) => {
   res.json({ message: 'CuraCare Health API is running...' });

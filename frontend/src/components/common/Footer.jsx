@@ -117,17 +117,17 @@ const Footer = () => {
               </h4>
               <ul className="space-y-2 sm:space-y-3 text-[10px] sm:text-sm text-primary-100/80">
                 <li className="flex items-start gap-1.5 sm:gap-3">
-                  <MapPin size={14} className="text-primary-300 shrink-0 mt-0.5 sm:w-[18px] sm:h-[18px]" />
+                  <MapPin size={14} className="text-primary-300 shrink-0 mt-0.5 sm:w-[/18px] sm:h-[/18px]" />
                   <a href="https://maps.google.com/?q=987P%2BJ3F%2C%20Near%20Pathal%20kudwa%20Chowk%2C%20Pathalkudwa%2C%20Ranchi%2C%20Jharkhand%20834001" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                     987P+J3F, Near Pathal kudwa Chowk, Pathalkudwa, Ranchi, Jharkhand 834001
                   </a>
                 </li>
                 <li className="flex items-center gap-1.5 sm:gap-3">
-                  <Phone size={14} className="text-primary-300 shrink-0 sm:w-[18px] sm:h-[18px]" />
+                  <Phone size={14} className="text-primary-300 shrink-0 sm:w-[/18px] sm:h-[/18px]" />
                   <span className="truncate">7903719233</span>
                 </li>
                 <li className="flex items-center gap-1.5 sm:gap-3">
-                  <Mail size={14} className="text-primary-300 shrink-0 sm:w-[18px] sm:h-[18px]" />
+                  <Mail size={14} className="text-primary-300 shrink-0 sm:w-[/18px] sm:h-[/18px]" />
                   <span className="truncate">zeshan1234anwar@gmail.com</span>
                 </li>
               </ul>
