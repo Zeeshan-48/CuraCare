@@ -24,6 +24,23 @@ import {
 import ProductCard from '../components/products/ProductCard.jsx';
 import Button from '../components/ui/Button.jsx';
 
+const DEFAULT_BANNERS = [
+  {
+    _id: 'default-1',
+    title: 'Your Health, Delivered Right To Your Doorstep',
+    subtitle: 'Get up to 20% off on daily medicines and wellness supplements with verified prescription clearance.',
+    image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=1200',
+    link: '/products',
+  },
+  {
+    _id: 'default-2',
+    title: 'AI-Powered Medicine Recommendations',
+    subtitle: 'Confused about your symptoms? Input your symptoms and get instant verified over-the-counter suggestions.',
+    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1200',
+    link: '/ai-recommendations',
+  },
+];
+
 const Home = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -62,13 +79,13 @@ const Home = () => {
 
   const categories = categoriesData || [];
   const products = productsData?.products || [];
-  const banners = bannersData || [];
+  const banners = (bannersData && bannersData.length > 0) ? bannersData : DEFAULT_BANNERS;
   const testimonials = testimonialsData || [];
   const healthTips = healthTipsData || [];
 
   // Auto Slider for Banners
   useEffect(() => {
-    if (banners.length === 0) return;
+    if (banners.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentBanner((prev) => (prev + 1) % banners.length);
     }, 6000);
@@ -78,12 +95,12 @@ const Home = () => {
   return (
     <div className="flex flex-col gap-8 sm:gap-10 lg:gap-12 pb-20">
       {/* 1. Hero Promo Banner Slider */}
-      {bannersLoading ? (
-        <div className="w-full h-[/340px] sm:h-[380px] lg:h-[420px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm">
+      {bannersLoading && !bannersData ? (
+        <div className="w-full h-[340px] sm:h-[380px] lg:h-[420px] bg-bg-panel rounded-3xl max-w-7xl mx-auto flex items-center justify-center border border-bdr-light/50 shadow-sm text-txt-muted text-sm animate-pulse">
           Loading promotions...
         </div>
       ) : banners.length > 0 ? (
-        <div className="relative w-full h-[/340px] sm:h-[/380px] lg:h-[/420px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
+        <div className="relative w-full h-[340px] sm:h-[380px] lg:h-[420px] overflow-hidden bg-bg-panel rounded-3xl max-w-7xl mx-auto border border-bdr-light/50 shadow-sm">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentBanner}
@@ -98,21 +115,21 @@ const Home = () => {
                 const swipeThreshold = 50; // minimum drag distance in pixels to trigger slide transition
                 if (info.offset.x < -swipeThreshold) {
                   // Swiped left -> Go to Next Slide
-                  setCurrentBanner((currentBanner + 1) % banners.length);
+                  setCurrentBanner((prev) => (prev + 1) % banners.length);
                 } else if (info.offset.x > swipeThreshold) {
                   // Swiped right -> Go to Previous Slide
-                  setCurrentBanner((currentBanner - 1 + banners.length) % banners.length);
+                  setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
                 }
               }}
               className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing select-none"
             >
               {/* Blending Gradient Overlay - Enhances text readability */}
-              <div className="absolute inset-0 .bg-gradient-to-r from-black/90 via-black/60 to-transparent z-10 pointer-events-none" />
-              {banners[currentBanner] && (
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent z-10 pointer-events-none" />
+              {banners[currentBanner % banners.length] && (
                 <>
                   <img
-                    src={banners[currentBanner].image}
-                    alt="Healthcare Banner"
+                    src={banners[currentBanner % banners.length].image}
+                    alt={banners[currentBanner % banners.length].title || 'Healthcare Banner'}
                     className="absolute inset-0 w-full h-full object-cover z-0"
                   />
                   {/* Banner Captions */}
@@ -121,12 +138,12 @@ const Home = () => {
                       Medical Excellence
                     </span>
                     <h1 className="font-display font-extrabold text-2xl sm:text-4xl lg:text-4xl xl:text-[42px] leading-[1.15] text-white m-0 drop-shadow-lg line-clamp-2 lg:line-clamp-none">
-                      {banners[currentBanner].title}
+                      {banners[currentBanner % banners.length].title}
                     </h1>
                     <p className="text-xs sm:text-base text-gray-200 mt-2 mb-4 sm:mt-3 sm:mb-5 lg:mt-3 lg:mb-5 leading-relaxed font-medium max-w-lg lg:max-w-xl drop-shadow-md line-clamp-2 sm:line-clamp-3 lg:line-clamp-none">
-                      {banners[currentBanner].subtitle}
+                      {banners[currentBanner % banners.length].subtitle}
                     </p>
-                    <Link to={banners[currentBanner].link}>
+                    <Link to={banners[currentBanner % banners.length].link || '/products'}>
                       <Button variant="primary" size="md" className="shadow-lg shadow-primary-500/30 hover:scale-105 transition-transform duration-300">
                         Shop Products
                       </Button>
@@ -138,22 +155,28 @@ const Home = () => {
           </AnimatePresence>
 
           {/* Carousel Sliders Navigation */}
-          <button
-            onClick={() =>
-              setCurrentBanner(
-                (currentBanner - 1 + banners.length) % banners.length
-              )
-            }
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-bg-panel/80 hover:bg-bg-panel text-txt-main border border-bdr-light/80 shadow-md cursor-pointer transition-all duration-200 active:scale-95"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            onClick={() => setCurrentBanner((currentBanner + 1) % banners.length)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-bg-panel/80 hover:bg-bg-panel text-txt-main border border-bdr-light/80 shadow-md cursor-pointer transition-all duration-200 active:scale-95"
-          >
-            <ChevronRight size={20} />
-          </button>
+          {banners.length > 1 && (
+            <>
+              <button
+                onClick={() =>
+                  setCurrentBanner(
+                    (prev) => (prev - 1 + banners.length) % banners.length
+                  )
+                }
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-bg-panel/80 hover:bg-bg-panel text-txt-main border border-bdr-light/80 shadow-md cursor-pointer transition-all duration-200 active:scale-95"
+                aria-label="Previous Slide"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={() => setCurrentBanner((prev) => (prev + 1) % banners.length)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-bg-panel/80 hover:bg-bg-panel text-txt-main border border-bdr-light/80 shadow-md cursor-pointer transition-all duration-200 active:scale-95"
+                aria-label="Next Slide"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </>
+          )}
         </div>
       ) : null}
 

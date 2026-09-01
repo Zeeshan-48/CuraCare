@@ -143,7 +143,7 @@ const ProductCard = ({ product }) => {
               </button>
               <button
                 onClick={handleBuyNow}
-                className="flex-[/2] sm:flex-none px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] sm:text-xs font-bold shadow-md shadow-primary-500/10 hover:shadow-lg active:scale-95 transition-all cursor-pointer text-center"
+                className="flex-[2] sm:flex-none px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-[10px] sm:text-xs font-bold shadow-md shadow-primary-500/10 hover:shadow-lg active:scale-95 transition-all cursor-pointer text-center"
               >
                 Buy Now
               </button>
