@@ -260,7 +260,7 @@ export const deleteProduct = async (req, res, next) => {
 export const getAiRecommendations = async (req, res, next) => {
   const { symptomInput } = req.body;
 
-  if (!symptomInput) {
+  if (!symptomInput || !symptomInput.trim()) {
     res.status(400);
     return next(new Error('Symptom description is required'));
   }
@@ -269,20 +269,25 @@ export const getAiRecommendations = async (req, res, next) => {
     const products = await Product.find({}).populate('category', 'name');
 
     const runFallback = () => {
-      const keywords = symptomInput.toLowerCase().split(/[\s,]+/);
+      const stopWords = new Set(['i', 'a', 'an', 'the', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'with', 'my', 'is', 'am', 'are', 'was', 'were', 'have', 'has', 'had', 'feeling', 'feel', 'since', 'yesterday', 'today', 'need', 'something', 'please', 'help', 'get']);
+      const rawKeywords = symptomInput.toLowerCase().split(/[\s,.;!?]+/);
+      const keywords = rawKeywords.filter((k) => k.length >= 3 && !stopWords.has(k));
+
       const matched = products.filter((prod) => {
-        return keywords.some(
-          (key) =>
-            prod.name.toLowerCase().includes(key) ||
-            prod.genericName.toLowerCase().includes(key) ||
-            prod.uses.toLowerCase().includes(key) ||
-            prod.description.toLowerCase().includes(key)
-        );
+        const targetText = [
+          prod.name || '',
+          prod.genericName || '',
+          prod.uses || '',
+          prod.description || '',
+          prod.category?.name || '',
+        ].join(' ').toLowerCase();
+
+        return keywords.some((key) => targetText.includes(key));
       });
 
       const matchedProducts = matched.map((prod) => ({
         product: prod,
-        reason: `Matched keyword from your description in: ${prod.uses}`,
+        reason: `Matched relevant condition in: ${prod.uses || prod.description}`,
       }));
 
       return res.json({
@@ -312,92 +317,116 @@ export const getAiRecommendations = async (req, res, next) => {
 For each recommendation, give a clear reason detailing how it helps with the user's symptoms.
 Only recommend products that are relevant to the symptoms from the catalog. If no products are relevant, return an empty recommendations array.
 
-Return a JSON object exactly matching this schema:
+Return a JSON object strictly matching this schema:
 {
-  "analysis": "A summary of the symptom analysis and overall advice.",
+  "analysis": "A concise clinical summary of the symptom analysis and health advice.",
   "recommendations": [
     {
-      "productId": "string (the product id)",
+      "productId": "string (exact id matching the product from catalog)",
       "reason": "string (why this product is suitable for the symptom)"
     }
   ],
   "disclaimer": "Clinical safety disclaimer statement."
 }
 
-Do not include any markdown formatting or prefix like \`\`\`json. Return only the raw JSON string.
+Do not include any markdown formatting or explanations outside the JSON object.
 
 Product Catalog:
 ${JSON.stringify(catalog)}`;
 
     try {
-      const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
-      let response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [{ text: `${systemPrompt}\n\nUser Symptoms:\n${symptomInput}` }],
-              },
-            ],
-          }),
-        }
-      );
+      const candidateModels = [
+        process.env.GEMINI_MODEL,
+        'gemini-3.6-flash',
+        'gemini-2.5-flash-lite',
+        'gemini-flash-latest',
+      ].filter(Boolean);
 
-      // Fallback model if primary model returns 404
-      if (!response.ok && response.status === 404 && model !== 'gemini-3.5-flash') {
-        response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [
-                {
-                  role: 'user',
-                  parts: [{ text: `${systemPrompt}\n\nUser Symptoms:\n${symptomInput}` }],
+      // Deduplicate model names
+      const uniqueModels = [...new Set(candidateModels)];
+
+      let responseText = null;
+      let lastError = null;
+
+      for (const model of uniqueModels) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    role: 'user',
+                    parts: [{ text: `${systemPrompt}\n\nUser Symptoms:\n${symptomInput}` }],
+                  },
+                ],
+                generationConfig: {
+                  responseMimeType: 'application/json',
+                  temperature: 0.2,
                 },
-              ],
-            }),
+              }),
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (rawText) {
+              responseText = rawText;
+              break;
+            }
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            lastError = new Error(`Model ${model} returned status ${response.status}: ${errorData.error?.message || response.statusText}`);
           }
-        );
+        } catch (modelErr) {
+          lastError = modelErr;
+        }
       }
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Failed to call Gemini API');
+      if (!responseText) {
+        throw lastError || new Error('All Gemini models failed to generate a response');
       }
 
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
       let aiResponse;
       try {
-        const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        aiResponse = JSON.parse(cleaned);
-      } catch (e) {
-        console.error('Failed to parse Gemini JSON:', text);
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          aiResponse = JSON.parse(jsonMatch[0]);
+        } else {
+          aiResponse = JSON.parse(responseText.trim());
+        }
+      } catch (parseErr) {
+        console.error('Failed to parse Gemini JSON output:', responseText);
         throw new Error('Invalid JSON format returned by AI model');
       }
 
       const matchedProducts = [];
       if (aiResponse.recommendations && Array.isArray(aiResponse.recommendations)) {
         for (const rec of aiResponse.recommendations) {
-          const prod = products.find((p) => p._id.toString() === rec.productId);
-          if (prod) {
+          const prod = products.find(
+            (p) =>
+              (rec.productId && p._id.toString() === rec.productId.toString()) ||
+              (rec.name && p.name.toLowerCase() === rec.name.toLowerCase()) ||
+              (rec.productName && p.name.toLowerCase() === rec.productName.toLowerCase())
+          );
+          if (prod && !matchedProducts.some((m) => m.product._id.toString() === prod._id.toString())) {
             matchedProducts.push({
               product: prod,
-              reason: rec.reason,
+              reason: rec.reason || `Recommended for reported symptoms.`,
             });
           }
         }
       }
 
       res.json({
-        analysis: aiResponse.analysis,
+        analysis: aiResponse.analysis || 'Clinical symptom analysis complete.',
         recommendations: matchedProducts,
-        disclaimer: aiResponse.disclaimer || "Always consult with a doctor before consuming drugs.",
+        disclaimer:
+          aiResponse.disclaimer ||
+          'Clinical Safety Disclaimer: Always consult with a certified medical doctor before taking medication.',
         isFallback: false,
       });
     } catch (apiError) {
